@@ -4,34 +4,38 @@ import "./globals.css";
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#0f766e",
+  themeColor: "#0891b2",
 };
 
 export const metadata: Metadata = {
-  title: "Collins SEO | Search Engine Optimization That Delivers Results",
+  title: "Radiant Health Chiropractic | Dr. Collins - Natural Pain Relief",
   description:
-    "Collins SEO helps businesses grow through strategic search engine optimization. We focus on sustainable rankings, quality traffic, and real business results.",
+    "Dr. Collins at Radiant Health Chiropractic provides expert chiropractic care for back pain, neck pain, headaches, and overall wellness. Schedule your appointment today.",
   keywords: [
-    "SEO",
-    "search engine optimization",
-    "digital marketing",
-    "organic traffic",
-    "local SEO",
-    "technical SEO",
+    "chiropractor",
+    "chiropractic care",
+    "back pain",
+    "neck pain",
+    "headaches",
+    "spinal adjustment",
+    "Dr. Collins",
+    "Radiant Health Chiropractic",
+    "natural pain relief",
+    "wellness",
   ],
-  authors: [{ name: "Collins SEO" }],
+  authors: [{ name: "Dr. Collins" }],
   openGraph: {
-    title: "Collins SEO | Search Engine Optimization That Delivers Results",
+    title: "Radiant Health Chiropractic | Dr. Collins",
     description:
-      "Collins SEO helps businesses grow through strategic search engine optimization.",
+      "Expert chiropractic care for back pain, neck pain, headaches, and overall wellness. Experience natural healing with Dr. Collins.",
     type: "website",
     locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Collins SEO | Search Engine Optimization That Delivers Results",
+    title: "Radiant Health Chiropractic | Dr. Collins",
     description:
-      "Collins SEO helps businesses grow through strategic search engine optimization.",
+      "Expert chiropractic care for back pain, neck pain, headaches, and overall wellness.",
   },
   robots: {
     index: true,

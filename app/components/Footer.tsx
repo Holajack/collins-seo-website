@@ -11,11 +11,11 @@ export default function Footer() {
               href="#"
               className="text-xl font-semibold tracking-tight text-[var(--foreground)]"
             >
-              Collins<span className="text-[var(--primary)]">SEO</span>
+              <span className="text-[var(--primary)]">Radiant</span> Health
             </a>
             <p className="mt-4 text-[15px] leading-relaxed text-[var(--muted)]">
-              Helping businesses grow through strategic, results-driven search
-              engine optimization.
+              Helping you live pain-free through natural, personalized
+              chiropractic care.
             </p>
           </div>
 
@@ -30,7 +30,7 @@ export default function Footer() {
                   href="#services"
                   className="text-[15px] text-[var(--muted)] hover:text-[var(--primary)]"
                 >
-                  Technical SEO
+                  Spinal Adjustments
                 </a>
               </li>
               <li>
@@ -38,7 +38,7 @@ export default function Footer() {
                   href="#services"
                   className="text-[15px] text-[var(--muted)] hover:text-[var(--primary)]"
                 >
-                  Local SEO
+                  Back Pain Relief
                 </a>
               </li>
               <li>
@@ -46,7 +46,7 @@ export default function Footer() {
                   href="#services"
                   className="text-[15px] text-[var(--muted)] hover:text-[var(--primary)]"
                 >
-                  Content Strategy
+                  Neck & Shoulder Care
                 </a>
               </li>
               <li>
@@ -54,16 +54,16 @@ export default function Footer() {
                   href="#services"
                   className="text-[15px] text-[var(--muted)] hover:text-[var(--primary)]"
                 >
-                  Link Building
+                  Headache Treatment
                 </a>
               </li>
             </ul>
           </div>
 
-          {/* Company */}
+          {/* Quick Links */}
           <div>
             <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[var(--foreground)]">
-              Company
+              Quick Links
             </h4>
             <ul className="space-y-3">
               <li>
@@ -71,15 +71,15 @@ export default function Footer() {
                   href="#about"
                   className="text-[15px] text-[var(--muted)] hover:text-[var(--primary)]"
                 >
-                  About Us
+                  About Dr. Collins
                 </a>
               </li>
               <li>
                 <a
-                  href="#results"
+                  href="#testimonials"
                   className="text-[15px] text-[var(--muted)] hover:text-[var(--primary)]"
                 >
-                  Case Studies
+                  Patient Stories
                 </a>
               </li>
               <li>
@@ -87,7 +87,7 @@ export default function Footer() {
                   href="#contact"
                   className="text-[15px] text-[var(--muted)] hover:text-[var(--primary)]"
                 >
-                  Contact
+                  Book Appointment
                 </a>
               </li>
             </ul>
@@ -96,14 +96,19 @@ export default function Footer() {
           {/* Contact */}
           <div>
             <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[var(--foreground)]">
-              Get in Touch
+              Contact
             </h4>
             <ul className="space-y-3">
               <li className="text-[15px] text-[var(--muted)]">
-                hello@collinsseo.com
+                123 Wellness Way, Suite 100
+                <br />
+                Healthville, CA 90210
               </li>
               <li className="text-[15px] text-[var(--muted)]">
                 (555) 123-4567
+              </li>
+              <li className="text-[15px] text-[var(--muted)]">
+                info@radianthealth.com
               </li>
             </ul>
           </div>
@@ -112,7 +117,8 @@ export default function Footer() {
         {/* Bottom */}
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-[var(--border)] pt-8 sm:flex-row">
           <p className="text-sm text-[var(--muted)]">
-            &copy; {currentYear} Collins SEO. All rights reserved.
+            &copy; {currentYear} Radiant Health Chiropractic. All rights
+            reserved.
           </p>
           <div className="flex gap-6">
             <a

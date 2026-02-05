@@ -12,9 +12,9 @@ export default function Header() {
           {/* Logo */}
           <a
             href="#"
-            className="text-xl font-semibold tracking-tight text-[var(--foreground)]"
+            className="text-lg sm:text-xl font-semibold tracking-tight text-[var(--foreground)]"
           >
-            Collins<span className="text-[var(--primary)]">SEO</span>
+            <span className="text-[var(--primary)]">Radiant</span> Health
           </a>
 
           {/* Desktop Navigation */}
@@ -32,16 +32,16 @@ export default function Header() {
               About
             </a>
             <a
-              href="#results"
+              href="#testimonials"
               className="text-[15px] text-[var(--muted)] hover:text-[var(--foreground)]"
             >
-              Results
+              Testimonials
             </a>
             <a
               href="#contact"
               className="inline-flex h-10 items-center justify-center rounded-lg bg-[var(--primary)] px-5 text-[15px] font-medium text-white hover:bg-[var(--primary-dark)]"
             >
-              Get Started
+              Book Appointment
             </a>
           </div>
 
@@ -94,18 +94,18 @@ export default function Header() {
                 About
               </a>
               <a
-                href="#results"
+                href="#testimonials"
                 onClick={() => setIsMenuOpen(false)}
                 className="rounded-lg px-4 py-3 text-[15px] text-[var(--muted)] hover:bg-[var(--slate-100)] hover:text-[var(--foreground)] dark:hover:bg-[var(--slate-800)]"
               >
-                Results
+                Testimonials
               </a>
               <a
                 href="#contact"
                 onClick={() => setIsMenuOpen(false)}
                 className="mt-2 inline-flex h-12 items-center justify-center rounded-lg bg-[var(--primary)] px-5 text-[15px] font-medium text-white hover:bg-[var(--primary-dark)]"
               >
-                Get Started
+                Book Appointment
               </a>
             </div>
           </div>

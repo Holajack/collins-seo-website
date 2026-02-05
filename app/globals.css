@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
 :root {
-  /* Primary brand colors - warm, trustworthy teal/slate */
-  --primary: #0f766e;
-  --primary-dark: #0d5d57;
-  --primary-light: #14b8a6;
+  /* Primary brand colors - calming health/wellness blue-green */
+  --primary: #0891b2;
+  --primary-dark: #0e7490;
+  --primary-light: #22d3ee;
 
   /* Neutral palette - warm grays */
   --slate-950: #0c0f12;
@@ -19,7 +19,7 @@
   --slate-100: #f1f4f7;
   --slate-50: #f8fafb;
 
-  /* Accent */
+  /* Accent - warm amber for CTAs */
   --accent: #f59e0b;
   --accent-light: #fbbf24;
 
@@ -102,6 +102,6 @@ button {
 @media (hover: none) {
   a,
   button {
-    -webkit-tap-highlight-color: rgba(15, 118, 110, 0.1);
+    -webkit-tap-highlight-color: rgba(8, 145, 178, 0.1);
   }
 }
