@@ -1,12 +1,17 @@
 @import "tailwindcss";
 
 :root {
-  /* Primary brand colors - warm, trustworthy teal/slate */
-  --primary: #0f766e;
-  --primary-dark: #0d5d57;
-  --primary-light: #14b8a6;
+  /* Primary brand colors - professional healthcare blue */
+  --primary: #1a6b8a;
+  --primary-dark: #145a75;
+  --primary-light: #2a8fb5;
 
-  /* Neutral palette - warm grays */
+  /* Secondary - warm wellness green */
+  --secondary: #2d8a6e;
+  --secondary-dark: #24705a;
+  --secondary-light: #3aad8a;
+
+  /* Neutral palette */
   --slate-950: #0c0f12;
   --slate-900: #1a1f26;
   --slate-800: #2d3540;
@@ -20,8 +25,8 @@
   --slate-50: #f8fafb;
 
   /* Accent */
-  --accent: #f59e0b;
-  --accent-light: #fbbf24;
+  --accent: #c4882d;
+  --accent-light: #d9a04a;
 
   /* Semantic */
   --background: #ffffff;
@@ -40,6 +45,9 @@
   --color-primary: var(--primary);
   --color-primary-dark: var(--primary-dark);
   --color-primary-light: var(--primary-light);
+  --color-secondary: var(--secondary);
+  --color-secondary-dark: var(--secondary-dark);
+  --color-secondary-light: var(--secondary-light);
   --color-muted: var(--muted);
   --color-accent: var(--accent);
   --font-sans: var(--font-sans);
@@ -102,6 +110,54 @@ button {
 @media (hover: none) {
   a,
   button {
-    -webkit-tap-highlight-color: rgba(15, 118, 110, 0.1);
+    -webkit-tap-highlight-color: rgba(26, 107, 138, 0.1);
   }
+}
+
+/* Blog content styles */
+.blog-content h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  color: var(--foreground);
+}
+
+.blog-content h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 1.75rem;
+  margin-bottom: 0.75rem;
+  color: var(--foreground);
+}
+
+.blog-content p {
+  margin-bottom: 1.25rem;
+  line-height: 1.8;
+  color: var(--muted);
+}
+
+.blog-content ul,
+.blog-content ol {
+  margin-bottom: 1.25rem;
+  padding-left: 1.5rem;
+}
+
+.blog-content li {
+  margin-bottom: 0.5rem;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+.blog-content ul li {
+  list-style-type: disc;
+}
+
+.blog-content ol li {
+  list-style-type: decimal;
+}
+
+.blog-content strong {
+  color: var(--foreground);
+  font-weight: 600;
 }
