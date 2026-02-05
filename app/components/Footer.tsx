@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
@@ -7,16 +9,25 @@ export default function Footer() {
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           {/* Brand */}
           <div className="sm:col-span-2 lg:col-span-1">
-            <a
-              href="#"
+            <Link
+              href="/"
               className="text-xl font-semibold tracking-tight text-[var(--foreground)]"
             >
-              Collins<span className="text-[var(--primary)]">SEO</span>
-            </a>
+              Dr. Collins<span className="text-[var(--primary)]">, DC</span>
+            </Link>
             <p className="mt-4 text-[15px] leading-relaxed text-[var(--muted)]">
-              Helping businesses grow through strategic, results-driven search
-              engine optimization.
+              Expert chiropractic care and acupuncture in Port Orange, FL.
+              Palmer College of Chiropractic graduate dedicated to helping you
+              live pain-free.
             </p>
+            <div className="mt-4">
+              <a
+                href="tel:+13863089076"
+                className="text-[15px] font-medium text-[var(--primary)] hover:text-[var(--primary-dark)]"
+              >
+                (386) 308-9076
+              </a>
+            </div>
           </div>
 
           {/* Services */}
@@ -26,107 +37,147 @@ export default function Footer() {
             </h4>
             <ul className="space-y-3">
               <li>
-                <a
-                  href="#services"
+                <Link
+                  href="/services"
                   className="text-[15px] text-[var(--muted)] hover:text-[var(--primary)]"
                 >
-                  Technical SEO
-                </a>
+                  Chiropractic Care
+                </Link>
               </li>
               <li>
-                <a
-                  href="#services"
+                <Link
+                  href="/services"
                   className="text-[15px] text-[var(--muted)] hover:text-[var(--primary)]"
                 >
-                  Local SEO
-                </a>
+                  Acupuncture
+                </Link>
               </li>
               <li>
-                <a
-                  href="#services"
+                <Link
+                  href="/services"
                   className="text-[15px] text-[var(--muted)] hover:text-[var(--primary)]"
                 >
-                  Content Strategy
-                </a>
+                  Spinal Decompression
+                </Link>
               </li>
               <li>
-                <a
-                  href="#services"
+                <Link
+                  href="/services"
                   className="text-[15px] text-[var(--muted)] hover:text-[var(--primary)]"
                 >
-                  Link Building
-                </a>
+                  Pain Management
+                </Link>
               </li>
             </ul>
           </div>
 
-          {/* Company */}
+          {/* Quick Links */}
           <div>
             <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[var(--foreground)]">
-              Company
+              Quick Links
             </h4>
             <ul className="space-y-3">
               <li>
-                <a
-                  href="#about"
+                <Link
+                  href="/about"
                   className="text-[15px] text-[var(--muted)] hover:text-[var(--primary)]"
                 >
-                  About Us
-                </a>
+                  About Dr. Collins
+                </Link>
               </li>
               <li>
-                <a
-                  href="#results"
+                <Link
+                  href="/new-patient"
                   className="text-[15px] text-[var(--muted)] hover:text-[var(--primary)]"
                 >
-                  Case Studies
-                </a>
+                  New Patient Forms
+                </Link>
               </li>
               <li>
-                <a
-                  href="#contact"
+                <Link
+                  href="/blog"
                   className="text-[15px] text-[var(--muted)] hover:text-[var(--primary)]"
                 >
-                  Contact
-                </a>
+                  Health Blog
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/contact"
+                  className="text-[15px] text-[var(--muted)] hover:text-[var(--primary)]"
+                >
+                  Contact Us
+                </Link>
               </li>
             </ul>
           </div>
 
-          {/* Contact */}
+          {/* Office Info */}
           <div>
             <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[var(--foreground)]">
-              Get in Touch
+              Office
             </h4>
             <ul className="space-y-3">
               <li className="text-[15px] text-[var(--muted)]">
-                hello@collinsseo.com
+                209 Dunlawton Ave, Suite 18
+                <br />
+                Port Orange, FL 32127
+              </li>
+              <li>
+                <a
+                  href="tel:+13863089076"
+                  className="text-[15px] text-[var(--muted)] hover:text-[var(--primary)]"
+                >
+                  (386) 308-9076
+                </a>
+              </li>
+              <li>
+                <a
+                  href="mailto:askradianthealth@gmail.com"
+                  className="text-[15px] text-[var(--muted)] hover:text-[var(--primary)]"
+                >
+                  askradianthealth@gmail.com
+                </a>
               </li>
               <li className="text-[15px] text-[var(--muted)]">
-                (555) 123-4567
+                Mon-Fri: 9:00 AM - 6:00 PM
               </li>
             </ul>
           </div>
         </div>
 
-        {/* Bottom */}
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-[var(--border)] pt-8 sm:flex-row">
+        {/* Insurance notice */}
+        <div className="mt-10 rounded-lg bg-[var(--primary)]/5 border border-[var(--primary)]/10 p-4 text-center">
           <p className="text-sm text-[var(--muted)]">
-            &copy; {currentYear} Collins SEO. All rights reserved.
+            We accept most major insurance plans including Medicare and Medicaid.{" "}
+            <Link
+              href="/contact"
+              className="text-[var(--primary)] font-medium hover:text-[var(--primary-dark)]"
+            >
+              Contact us to verify your coverage.
+            </Link>
+          </p>
+        </div>
+
+        {/* Bottom */}
+        <div className="mt-8 flex flex-col items-center justify-between gap-4 border-t border-[var(--border)] pt-8 sm:flex-row">
+          <p className="text-sm text-[var(--muted)]">
+            &copy; {currentYear} Dr. Collins, DC - Chiropractic Care &
+            Acupuncture. All rights reserved.
           </p>
           <div className="flex gap-6">
-            <a
-              href="#"
+            <Link
+              href="/privacy"
               className="text-sm text-[var(--muted)] hover:text-[var(--primary)]"
             >
               Privacy Policy
-            </a>
-            <a
-              href="#"
+            </Link>
+            <Link
+              href="/terms"
               className="text-sm text-[var(--muted)] hover:text-[var(--primary)]"
             >
               Terms of Service
-            </a>
+            </Link>
           </div>
         </div>
       </div>

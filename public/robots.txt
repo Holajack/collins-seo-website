@@ -1,0 +1,11 @@
+# Dr. Collins, DC - Chiropractic Care & Acupuncture
+# Port Orange, FL
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://drcollinschiropractor.com/sitemap.xml
+
+# Crawl-delay for respectful crawling
+Crawl-delay: 1

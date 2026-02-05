@@ -1,56 +1,103 @@
 import Header from "./components/Header";
-import ServiceCard from "./components/ServiceCard";
 import Footer from "./components/Footer";
+import ServiceCard from "./components/ServiceCard";
+import Link from "next/link";
+import { FAQSchema } from "./components/SchemaMarkup";
+
+const faqs = [
+  {
+    question:
+      "Does Dr. Collins accept insurance for chiropractic care in Port Orange?",
+    answer:
+      "Yes, Dr. Collins accepts most major insurance plans including Medicare and Medicaid. Contact our office at (386) 308-9076 to verify your specific coverage before your visit.",
+  },
+  {
+    question: "What should I expect at my first chiropractic visit?",
+    answer:
+      "Your first visit includes a thorough consultation, health history review, physical examination, and if necessary, diagnostic imaging. Dr. Collins will discuss findings and create a personalized treatment plan. You can complete your intake forms online before arriving to save time.",
+  },
+  {
+    question: "Does Dr. Collins provide acupuncture treatment?",
+    answer:
+      "Yes, Dr. Collins is trained in acupuncture and offers it as a complementary treatment alongside chiropractic care. Acupuncture can help with pain management, stress relief, headaches, and many other conditions.",
+  },
+  {
+    question:
+      "What conditions does chiropractic care treat?",
+    answer:
+      "Dr. Collins treats a wide range of conditions including back pain, neck pain, headaches, migraines, sciatica, herniated discs, sports injuries, auto accident injuries, carpal tunnel syndrome, and general joint pain. Both chiropractic adjustments and acupuncture are available.",
+  },
+  {
+    question: "Where is Dr. Collins located in Port Orange?",
+    answer:
+      "Dr. Collins is located at 209 Dunlawton Ave, Suite 18, Port Orange, FL 32127. The office is conveniently located and serves patients from Port Orange, Daytona Beach, South Daytona, New Smyrna Beach, and surrounding Volusia County communities.",
+  },
+];
 
 export default function Home() {
   return (
     <>
+      <FAQSchema faqs={faqs} />
       <Header />
 
       <main>
-        {/* Hero Section */}
-        <section className="relative overflow-hidden pt-28 pb-16 sm:pt-36 sm:pb-24">
-          {/* Background gradient */}
-          <div className="absolute inset-0 -z-10 bg-gradient-to-b from-[var(--primary)]/[0.03] to-transparent" />
+        {/* Hero Section - Three Second Rule: Problem, Solution, Contact */}
+        <section className="relative overflow-hidden pt-36 pb-16 sm:pt-44 sm:pb-24">
+          <div className="absolute inset-0 -z-10 bg-gradient-to-b from-[var(--primary)]/[0.04] to-transparent" />
 
           <div className="mx-auto max-w-6xl px-5 sm:px-8">
             <div className="mx-auto max-w-3xl text-center">
-              {/* Badge */}
+              {/* Problem - immediate identification */}
               <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[var(--primary)]/20 bg-[var(--primary)]/5 px-4 py-1.5">
                 <span className="h-1.5 w-1.5 rounded-full bg-[var(--primary)]" />
                 <span className="text-sm font-medium text-[var(--primary)]">
-                  SEO that actually works
+                  Chiropractor & Acupuncture in Port Orange, FL
                 </span>
               </div>
 
-              {/* Headline */}
               <h1 className="text-[2.5rem] font-bold leading-[1.1] tracking-tight text-[var(--foreground)] sm:text-5xl lg:text-6xl">
-                Get found by the
+                Living with
                 <br />
                 <span className="text-[var(--primary)]">
-                  customers you want
+                  back pain, neck pain,
                 </span>
+                <br />
+                or headaches?
               </h1>
 
-              {/* Subheadline */}
+              {/* Solution */}
               <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-[var(--muted)] sm:text-xl">
-                We help businesses rank higher on Google through proven SEO
-                strategies. No tricks, no shortcuts—just sustainable growth.
+                Dr. Collins provides expert chiropractic adjustments and
+                acupuncture to relieve your pain and restore your quality of
+                life. Palmer College graduate serving Port Orange and surrounding
+                communities.
               </p>
 
-              {/* CTAs */}
+              {/* Contact - immediate action */}
               <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
                 <a
-                  href="#contact"
-                  className="inline-flex h-12 w-full items-center justify-center rounded-lg bg-[var(--primary)] px-8 text-[15px] font-medium text-white shadow-lg shadow-[var(--primary)]/20 hover:bg-[var(--primary-dark)] sm:w-auto"
+                  href="tel:+13863089076"
+                  className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-[var(--primary)] px-8 text-[15px] font-medium text-white shadow-lg shadow-[var(--primary)]/20 hover:bg-[var(--primary-dark)] sm:w-auto"
                 >
-                  Start Your Project
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                  </svg>
+                  Call (386) 308-9076
                 </a>
-                <a
-                  href="#services"
+                <Link
+                  href="/new-patient"
                   className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-lg border border-[var(--border)] bg-white px-8 text-[15px] font-medium text-[var(--foreground)] hover:border-[var(--muted)] hover:bg-[var(--slate-50)] sm:w-auto dark:bg-[var(--slate-900)] dark:hover:bg-[var(--slate-800)]"
                 >
-                  See Our Services
+                  New Patient? Start Here
                   <svg
                     width="16"
                     height="16"
@@ -61,7 +108,7 @@ export default function Home() {
                   >
                     <path d="M3.5 8h9M8.5 4l4 4-4 4" />
                   </svg>
-                </a>
+                </Link>
               </div>
 
               {/* Trust indicators */}
@@ -80,7 +127,7 @@ export default function Home() {
                       clipRule="evenodd"
                     />
                   </svg>
-                  50+ clients served
+                  Palmer College Graduate
                 </div>
                 <div className="flex items-center gap-2">
                   <svg
@@ -96,7 +143,7 @@ export default function Home() {
                       clipRule="evenodd"
                     />
                   </svg>
-                  97% retention rate
+                  Most Insurances Accepted
                 </div>
                 <div className="flex items-center gap-2">
                   <svg
@@ -112,7 +159,7 @@ export default function Home() {
                       clipRule="evenodd"
                     />
                   </svg>
-                  8+ years experience
+                  Chiropractic & Acupuncture
                 </div>
               </div>
             </div>
@@ -122,17 +169,17 @@ export default function Home() {
         {/* Services Section */}
         <section id="services" className="py-16 sm:py-24 scroll-mt-20">
           <div className="mx-auto max-w-6xl px-5 sm:px-8">
-            {/* Section header */}
             <div className="mx-auto mb-12 max-w-2xl text-center sm:mb-16">
               <h2 className="text-3xl font-bold tracking-tight text-[var(--foreground)] sm:text-4xl">
-                What we do best
+                Comprehensive Care for Your Health
               </h2>
               <p className="mt-4 text-lg text-[var(--muted)]">
-                Comprehensive SEO services tailored to your business goals.
+                Dr. Collins offers a range of chiropractic and wellness services
+                designed to address the root cause of your pain, not just the
+                symptoms.
               </p>
             </div>
 
-            {/* Services grid */}
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               <ServiceCard
                 icon={
@@ -146,88 +193,13 @@ export default function Home() {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   >
-                    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+                    <path d="M18 20V6a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v14" />
+                    <path d="M2 20h20" />
+                    <path d="M14 12v.01" />
                   </svg>
                 }
-                title="Technical SEO"
-                description="Site audits, speed optimization, structured data, and fixing crawl issues that hold your site back from ranking."
-              />
-              <ServiceCard
-                icon={
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                    <circle cx="12" cy="10" r="3" />
-                  </svg>
-                }
-                title="Local SEO"
-                description="Google Business Profile optimization, local citations, and strategies to dominate your local market."
-              />
-              <ServiceCard
-                icon={
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M12 20h9" />
-                    <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
-                  </svg>
-                }
-                title="Content Strategy"
-                description="Keyword research, content planning, and SEO writing that attracts traffic and converts visitors."
-              />
-              <ServiceCard
-                icon={
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-                  </svg>
-                }
-                title="Link Building"
-                description="Quality backlink acquisition through outreach, digital PR, and content-driven strategies."
-              />
-              <ServiceCard
-                icon={
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <line x1="18" y1="20" x2="18" y2="10" />
-                    <line x1="12" y1="20" x2="12" y2="4" />
-                    <line x1="6" y1="20" x2="6" y2="14" />
-                  </svg>
-                }
-                title="Analytics & Reporting"
-                description="Clear, actionable reports that show exactly how your SEO investment is performing."
+                title="Chiropractic Adjustments"
+                description="Precise spinal adjustments to correct misalignments, reduce nerve interference, and restore proper function to your body. Relief for back pain, neck pain, and headaches."
               />
               <ServiceCard
                 icon={
@@ -242,101 +214,296 @@ export default function Home() {
                     strokeLinejoin="round"
                   >
                     <circle cx="12" cy="12" r="10" />
-                    <line x1="2" y1="12" x2="22" y2="12" />
-                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                    <path d="M12 8v8" />
+                    <path d="M8 12h8" />
                   </svg>
                 }
-                title="International SEO"
-                description="Multi-language and multi-region optimization for businesses targeting global audiences."
+                title="Acupuncture"
+                description="Traditional acupuncture therapy to manage pain, reduce inflammation, relieve stress, and promote natural healing throughout the body."
               />
+              <ServiceCard
+                icon={
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M9 18V5l12-2v13" />
+                    <circle cx="6" cy="18" r="3" />
+                    <circle cx="18" cy="16" r="3" />
+                  </svg>
+                }
+                title="Spinal Decompression"
+                description="Non-surgical spinal decompression therapy for herniated discs, bulging discs, sciatica, and degenerative disc disease without medication or surgery."
+              />
+              <ServiceCard
+                icon={
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                  </svg>
+                }
+                title="Auto Accident Injuries"
+                description="Specialized treatment for whiplash, soft tissue injuries, and musculoskeletal damage resulting from auto accidents. We work with your insurance."
+              />
+              <ServiceCard
+                icon={
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                  </svg>
+                }
+                title="Prenatal Chiropractic"
+                description="Gentle, safe chiropractic care for expecting mothers to reduce pregnancy-related discomfort, improve alignment, and support a healthier pregnancy."
+              />
+              <ServiceCard
+                icon={
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                  </svg>
+                }
+                title="Wellness & Maintenance"
+                description="Ongoing wellness care with periodic adjustments to maintain spinal health, prevent future issues, and keep your body functioning at its best."
+              />
+            </div>
+
+            <div className="mt-10 text-center">
+              <Link
+                href="/services"
+                className="inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-[var(--border)] bg-white px-8 text-[15px] font-medium text-[var(--foreground)] hover:border-[var(--primary)] hover:text-[var(--primary)] dark:bg-[var(--slate-900)]"
+              >
+                View All Services
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                >
+                  <path d="M3.5 8h9M8.5 4l4 4-4 4" />
+                </svg>
+              </Link>
             </div>
           </div>
         </section>
 
-        {/* About/Why Section */}
+        {/* About Section */}
         <section
           id="about"
           className="bg-[var(--slate-50)] py-16 sm:py-24 scroll-mt-20 dark:bg-[var(--slate-900)]"
         >
           <div className="mx-auto max-w-6xl px-5 sm:px-8">
             <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
-              {/* Content */}
               <div>
                 <h2 className="text-3xl font-bold tracking-tight text-[var(--foreground)] sm:text-4xl">
-                  SEO that focuses on what matters
+                  Your Health Is More Than Just Symptom Relief
                 </h2>
                 <p className="mt-6 text-lg leading-relaxed text-[var(--muted)]">
-                  Too many agencies chase vanity metrics. We focus on the things
-                  that actually move your business forward: qualified traffic,
-                  real leads, and measurable revenue growth.
+                  Dr. Collins takes a whole-person approach to chiropractic care.
+                  Rather than simply treating symptoms, he looks for the
+                  underlying causes of your discomfort and pain. By addressing
+                  spinal misalignments and nervous system interference, the body
+                  can heal itself naturally.
                 </p>
                 <p className="mt-4 text-lg leading-relaxed text-[var(--muted)]">
-                  Our approach is straightforward—we learn your business, find
-                  the opportunities, and execute with precision. No fluff, no
-                  confusing jargon, just clear communication and steady
-                  progress.
+                  As a graduate of Palmer College of Chiropractic here in Port
+                  Orange, Dr. Collins combines rigorous clinical training with a
+                  genuine commitment to each patient&apos;s long-term wellness.
+                  He also offers acupuncture as a complementary treatment for
+                  enhanced results.
                 </p>
 
-                {/* Stats */}
-                <div className="mt-10 grid grid-cols-3 gap-6">
+                {/* Why Dr. Collins */}
+                <div className="mt-10 grid grid-cols-2 gap-6">
                   <div>
-                    <div className="text-3xl font-bold text-[var(--primary)] sm:text-4xl">
-                      2.4x
+                    <div className="text-2xl font-bold text-[var(--primary)] sm:text-3xl">
+                      Palmer
                     </div>
                     <div className="mt-1 text-sm text-[var(--muted)]">
-                      Avg. traffic increase
+                      College Graduate
                     </div>
                   </div>
                   <div>
-                    <div className="text-3xl font-bold text-[var(--primary)] sm:text-4xl">
-                      180%
+                    <div className="text-2xl font-bold text-[var(--primary)] sm:text-3xl">
+                      Dual
                     </div>
                     <div className="mt-1 text-sm text-[var(--muted)]">
-                      Avg. lead growth
+                      Chiropractic & Acupuncture
                     </div>
                   </div>
                   <div>
-                    <div className="text-3xl font-bold text-[var(--primary)] sm:text-4xl">
-                      Top 3
+                    <div className="text-2xl font-bold text-[var(--primary)] sm:text-3xl">
+                      Insurance
                     </div>
                     <div className="mt-1 text-sm text-[var(--muted)]">
-                      Rankings achieved
+                      Most Plans Accepted
                     </div>
                   </div>
+                  <div>
+                    <div className="text-2xl font-bold text-[var(--primary)] sm:text-3xl">
+                      Whole
+                    </div>
+                    <div className="mt-1 text-sm text-[var(--muted)]">
+                      Person Approach
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-8">
+                  <Link
+                    href="/about"
+                    className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-[var(--primary)] px-8 text-[15px] font-medium text-white shadow-lg shadow-[var(--primary)]/20 hover:bg-[var(--primary-dark)]"
+                  >
+                    Learn More About Dr. Collins
+                  </Link>
                 </div>
               </div>
 
-              {/* Testimonial Card */}
+              {/* What Sets Us Apart Card */}
               <div className="rounded-2xl border border-[var(--border)] bg-white p-6 shadow-sm sm:p-8 dark:bg-[var(--slate-800)]">
-                <div className="flex gap-1 text-[var(--accent)]">
-                  {[...Array(5)].map((_, i) => (
-                    <svg
-                      key={i}
-                      width="20"
-                      height="20"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                  ))}
-                </div>
-                <blockquote className="mt-6 text-lg leading-relaxed text-[var(--foreground)]">
-                  &ldquo;Collins SEO transformed our online presence. Within 6
-                  months, we went from page 3 to position 1 for our main
-                  keywords. The increase in qualified leads has been
-                  remarkable.&rdquo;
-                </blockquote>
-                <div className="mt-6 flex items-center gap-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--primary)]/10 text-lg font-semibold text-[var(--primary)]">
-                    SK
-                  </div>
-                  <div>
-                    <div className="font-semibold text-[var(--foreground)]">
-                      Sarah Kim
+                <h3 className="text-xl font-bold text-[var(--foreground)] mb-6">
+                  What Sets Dr. Collins Apart
+                </h3>
+                <div className="space-y-5">
+                  <div className="flex gap-4">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[var(--primary)]/10">
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        className="text-[var(--primary)]"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
                     </div>
-                    <div className="text-sm text-[var(--muted)]">
-                      Marketing Director, TechStart Inc.
+                    <div>
+                      <h4 className="font-semibold text-[var(--foreground)]">
+                        Insurance-Friendly Practice
+                      </h4>
+                      <p className="mt-1 text-sm text-[var(--muted)]">
+                        We accept most major insurance plans, Medicare, and
+                        Medicaid, making quality care accessible and affordable.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex gap-4">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[var(--primary)]/10">
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        className="text-[var(--primary)]"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-[var(--foreground)]">
+                        Palmer-Trained Excellence
+                      </h4>
+                      <p className="mt-1 text-sm text-[var(--muted)]">
+                        Graduate of Palmer College of Chiropractic, the
+                        foundational institution of chiropractic education,
+                        located right here in Port Orange.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex gap-4">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[var(--primary)]/10">
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        className="text-[var(--primary)]"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-[var(--foreground)]">
+                        Chiropractic + Acupuncture
+                      </h4>
+                      <p className="mt-1 text-sm text-[var(--muted)]">
+                        Combining two powerful healing modalities for
+                        comprehensive pain relief and wellness that addresses
+                        your body as a whole.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex gap-4">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[var(--primary)]/10">
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        className="text-[var(--primary)]"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-[var(--foreground)]">
+                        Root-Cause Focus
+                      </h4>
+                      <p className="mt-1 text-sm text-[var(--muted)]">
+                        We treat the underlying cause of your pain, not just the
+                        symptoms, for lasting relief and long-term health
+                        improvement.
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -345,179 +512,146 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Results Section */}
-        <section id="results" className="py-16 sm:py-24 scroll-mt-20">
+        {/* Treatment Process Section */}
+        <section className="py-16 sm:py-24">
           <div className="mx-auto max-w-6xl px-5 sm:px-8">
             <div className="mx-auto mb-12 max-w-2xl text-center sm:mb-16">
               <h2 className="text-3xl font-bold tracking-tight text-[var(--foreground)] sm:text-4xl">
-                Real results, real growth
+                Your Path to Pain-Free Living
               </h2>
               <p className="mt-4 text-lg text-[var(--muted)]">
-                A few examples of what we&apos;ve achieved for our clients.
+                Dr. Collins follows a proven three-phase approach to get you
+                feeling better and keep you that way.
               </p>
             </div>
 
-            {/* Results grid */}
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {/* Result 1 */}
+            <div className="grid gap-5 sm:grid-cols-3">
               <div className="rounded-2xl border border-[var(--border)] bg-white p-6 sm:p-8 dark:bg-[var(--slate-900)]">
                 <div className="text-sm font-medium uppercase tracking-wider text-[var(--primary)]">
-                  E-commerce
+                  Phase 1
                 </div>
                 <h3 className="mt-3 text-xl font-semibold text-[var(--foreground)]">
-                  Online Retail Store
+                  Relief Care
                 </h3>
                 <p className="mt-3 text-[var(--muted)]">
-                  Organic traffic increased by 340% in 8 months through
-                  technical fixes and content optimization.
+                  The first priority is to reduce your pain and discomfort.
+                  Depending on the severity of your condition, visits are
+                  typically 2-3 times per week for 4-12 weeks.
                 </p>
-                <div className="mt-6 flex items-baseline gap-2">
-                  <span className="text-3xl font-bold text-[var(--foreground)]">
-                    +340%
-                  </span>
-                  <span className="text-sm text-[var(--muted)]">
-                    organic traffic
-                  </span>
-                </div>
               </div>
 
-              {/* Result 2 */}
               <div className="rounded-2xl border border-[var(--border)] bg-white p-6 sm:p-8 dark:bg-[var(--slate-900)]">
                 <div className="text-sm font-medium uppercase tracking-wider text-[var(--primary)]">
-                  Professional Services
+                  Phase 2
                 </div>
                 <h3 className="mt-3 text-xl font-semibold text-[var(--foreground)]">
-                  Law Firm
+                  Corrective Care
                 </h3>
                 <p className="mt-3 text-[var(--muted)]">
-                  Local SEO campaign resulted in 5x more consultation requests
-                  from the target service area.
+                  Once pain subsides, muscles and tissues need time to heal more
+                  completely. This phase strengthens and stabilizes your body to
+                  prevent recurrence.
                 </p>
-                <div className="mt-6 flex items-baseline gap-2">
-                  <span className="text-3xl font-bold text-[var(--foreground)]">
-                    5x
-                  </span>
-                  <span className="text-sm text-[var(--muted)]">
-                    more leads
-                  </span>
-                </div>
               </div>
 
-              {/* Result 3 */}
-              <div className="rounded-2xl border border-[var(--border)] bg-white p-6 sm:p-8 sm:col-span-2 lg:col-span-1 dark:bg-[var(--slate-900)]">
+              <div className="rounded-2xl border border-[var(--border)] bg-white p-6 sm:p-8 dark:bg-[var(--slate-900)]">
                 <div className="text-sm font-medium uppercase tracking-wider text-[var(--primary)]">
-                  SaaS
+                  Phase 3
                 </div>
                 <h3 className="mt-3 text-xl font-semibold text-[var(--foreground)]">
-                  B2B Software Company
+                  Wellness Care
                 </h3>
                 <p className="mt-3 text-[var(--muted)]">
-                  Content strategy and link building led to ranking for 200+ new
-                  keywords in competitive market.
+                  Periodic adjustments (1-4 times per month) help maintain your
+                  spinal health, prevent future problems, and keep you feeling
+                  your best long-term.
                 </p>
-                <div className="mt-6 flex items-baseline gap-2">
-                  <span className="text-3xl font-bold text-[var(--foreground)]">
-                    200+
-                  </span>
-                  <span className="text-sm text-[var(--muted)]">
-                    new keyword rankings
-                  </span>
-                </div>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ Section */}
+        <section className="bg-[var(--slate-50)] py-16 sm:py-24 dark:bg-[var(--slate-900)]">
+          <div className="mx-auto max-w-3xl px-5 sm:px-8">
+            <div className="mb-12 text-center">
+              <h2 className="text-3xl font-bold tracking-tight text-[var(--foreground)] sm:text-4xl">
+                Frequently Asked Questions
+              </h2>
+              <p className="mt-4 text-lg text-[var(--muted)]">
+                Common questions about chiropractic care and our practice.
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              {faqs.map((faq, index) => (
+                <div
+                  key={index}
+                  className="rounded-xl border border-[var(--border)] bg-white p-6 dark:bg-[var(--slate-800)]"
+                >
+                  <h3 className="text-lg font-semibold text-[var(--foreground)]">
+                    {faq.question}
+                  </h3>
+                  <p className="mt-3 text-[15px] leading-relaxed text-[var(--muted)]">
+                    {faq.answer}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
 
         {/* CTA Section */}
-        <section
-          id="contact"
-          className="bg-[var(--slate-950)] py-16 sm:py-24 scroll-mt-20 dark:bg-[var(--slate-800)]"
-        >
+        <section className="bg-[var(--slate-950)] py-16 sm:py-24 dark:bg-[var(--slate-800)]">
           <div className="mx-auto max-w-6xl px-5 sm:px-8">
             <div className="mx-auto max-w-2xl text-center">
               <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-                Ready to grow your organic traffic?
+                Ready to Start Feeling Better?
               </h2>
               <p className="mt-4 text-lg text-[var(--slate-400)]">
-                Let&apos;s talk about your SEO goals. Book a free consultation
-                and we&apos;ll show you exactly where the opportunities are.
+                Take the first step toward a pain-free life. Call our Port
+                Orange office or complete your new patient forms online to get
+                started.
               </p>
 
-              {/* Contact Form */}
-              <form className="mt-10 space-y-4 text-left">
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div>
-                    <label
-                      htmlFor="name"
-                      className="mb-2 block text-sm font-medium text-[var(--slate-300)]"
-                    >
-                      Name
-                    </label>
-                    <input
-                      type="text"
-                      id="name"
-                      name="name"
-                      className="h-12 w-full rounded-lg border border-[var(--slate-700)] bg-[var(--slate-900)] px-4 text-white placeholder:text-[var(--slate-500)] focus:border-[var(--primary)] focus:outline-none focus:ring-1 focus:ring-[var(--primary)]"
-                      placeholder="Your name"
-                    />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="email"
-                      className="mb-2 block text-sm font-medium text-[var(--slate-300)]"
-                    >
-                      Email
-                    </label>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      className="h-12 w-full rounded-lg border border-[var(--slate-700)] bg-[var(--slate-900)] px-4 text-white placeholder:text-[var(--slate-500)] focus:border-[var(--primary)] focus:outline-none focus:ring-1 focus:ring-[var(--primary)]"
-                      placeholder="you@company.com"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label
-                    htmlFor="website"
-                    className="mb-2 block text-sm font-medium text-[var(--slate-300)]"
-                  >
-                    Website
-                  </label>
-                  <input
-                    type="url"
-                    id="website"
-                    name="website"
-                    className="h-12 w-full rounded-lg border border-[var(--slate-700)] bg-[var(--slate-900)] px-4 text-white placeholder:text-[var(--slate-500)] focus:border-[var(--primary)] focus:outline-none focus:ring-1 focus:ring-[var(--primary)]"
-                    placeholder="https://yourwebsite.com"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="message"
-                    className="mb-2 block text-sm font-medium text-[var(--slate-300)]"
-                  >
-                    Tell us about your goals
-                  </label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    rows={4}
-                    className="w-full resize-none rounded-lg border border-[var(--slate-700)] bg-[var(--slate-900)] px-4 py-3 text-white placeholder:text-[var(--slate-500)] focus:border-[var(--primary)] focus:outline-none focus:ring-1 focus:ring-[var(--primary)]"
-                    placeholder="What are you looking to achieve with SEO?"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="h-12 w-full rounded-lg bg-[var(--primary)] font-medium text-white shadow-lg shadow-[var(--primary)]/20 hover:bg-[var(--primary-dark)] sm:w-auto sm:px-8"
+              <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+                <a
+                  href="tel:+13863089076"
+                  className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-[var(--primary)] px-8 text-[15px] font-medium text-white shadow-lg shadow-[var(--primary)]/20 hover:bg-[var(--primary-dark)] sm:w-auto"
                 >
-                  Send Message
-                </button>
-              </form>
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                  </svg>
+                  Call (386) 308-9076
+                </a>
+                <Link
+                  href="/new-patient"
+                  className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-lg border border-[var(--slate-700)] bg-transparent px-8 text-[15px] font-medium text-white hover:bg-[var(--slate-800)] sm:w-auto"
+                >
+                  Complete Patient Forms Online
+                </Link>
+              </div>
 
-              <p className="mt-6 text-sm text-[var(--slate-500)]">
-                We typically respond within 24 hours.
-              </p>
+              <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-[var(--slate-400)]">
+                <span>209 Dunlawton Ave, Suite 18</span>
+                <span className="hidden sm:inline text-[var(--slate-600)]">
+                  |
+                </span>
+                <span>Port Orange, FL 32127</span>
+                <span className="hidden sm:inline text-[var(--slate-600)]">
+                  |
+                </span>
+                <span>Mon-Fri: 9am - 6pm</span>
+              </div>
             </div>
           </div>
         </section>
