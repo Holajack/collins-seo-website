@@ -38,6 +38,12 @@ export interface Vehicle {
   /** Legroom behind the front seat when the front seat is all the way BACK (in). */
   secondRowLegroomMin: number;
 
+  /** Exterior dimensions (in) used to render the to-scale 3D body. */
+  extLength?: number;
+  extWidth?: number;
+  extHeight?: number;
+  wheelbase?: number;
+
   /** Published cargo volumes for reference (cu ft). */
   cargoCuFtBehindLast?: number;
   cargoCuFtMax?: number;

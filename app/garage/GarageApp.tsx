@@ -29,6 +29,15 @@ const FitScene = dynamic(() => import("./components/FitScene"), {
   ),
 });
 
+const VehicleModel = dynamic(() => import("./components/VehicleModel"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-full items-center justify-center text-slate-500">
+      Loading 3D model…
+    </div>
+  ),
+});
+
 const SEAT_HEIGHT_CLEARANCE = 34; // inches of headroom assumed in the cabin
 
 function lerp(a: number, b: number, t: number) {
@@ -56,6 +65,7 @@ export default function GarageApp() {
     }));
   const [selected, setSelected] = useState<string | null>(null);
   const [showEditor, setShowEditor] = useState(false);
+  const [view, setView] = useState<"fit" | "model">("model");
   const [lookup, setLookup] = useState("");
   const [lookupBusy, setLookupBusy] = useState(false);
   const [lookupMsg, setLookupMsg] = useState<string | null>(null);
@@ -374,20 +384,45 @@ export default function GarageApp() {
 
       {/* ---------------- 3D scene + status ---------------- */}
       <div className="flex flex-col gap-3">
-        <div className="relative h-[55vh] min-h-[380px] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm lg:h-[calc(100vh-2rem)]">
-          <FitScene
-            width={space.width}
-            length={space.length}
-            height={space.height}
-            placed={placed}
-            resolve={findItem}
-            fit={fit}
-            selectedUid={selected}
-            onSelect={setSelected}
-            onMove={moveItem}
-          />
+        <div className="flex gap-2">
+          <ModeButton active={view === "model"} onClick={() => setView("model")}>
+            🚗 Vehicle model
+          </ModeButton>
+          <ModeButton active={view === "fit"} onClick={() => setView("fit")}>
+            🧪 Fit test
+          </ModeButton>
+        </div>
+        <div className="relative h-[55vh] min-h-[380px] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm lg:h-[calc(100vh-7rem)]">
+          {view === "model" ? (
+            <VehicleModel vehicle={vehicle} />
+          ) : (
+            <FitScene
+              width={space.width}
+              length={space.length}
+              height={space.height}
+              placed={placed}
+              resolve={findItem}
+              fit={fit}
+              selectedUid={selected}
+              onSelect={setSelected}
+              onMove={moveItem}
+            />
+          )}
+
+          {/* Model-view caption */}
+          {view === "model" && (
+            <div className="pointer-events-none absolute top-3 left-3 flex flex-col gap-2">
+              <div className="rounded-lg bg-[#1a6b8a] px-3 py-1.5 text-sm font-bold text-white shadow">
+                {vehicle.make} {vehicle.model}
+              </div>
+              <div className="rounded-lg bg-white/85 px-3 py-1.5 text-xs font-medium text-slate-700 shadow">
+                To-scale 3D model · drag to orbit · green panel = cargo opening
+              </div>
+            </div>
+          )}
 
           {/* Fit badge */}
+          {view === "fit" && (
           <div className="pointer-events-none absolute top-3 left-3 flex flex-col gap-2">
             <div
               className={`rounded-lg px-3 py-1.5 text-sm font-bold text-white shadow ${
@@ -409,9 +444,10 @@ export default function GarageApp() {
               {space.height}&quot; H · floor used {fit.floorUsedPct.toFixed(0)}%
             </div>
           </div>
+          )}
 
           {/* Selected item toolbar */}
-          {selectedItem && selectedDef && (
+          {view === "fit" && selectedItem && selectedDef && (
             <div className="absolute right-3 bottom-3 left-3 flex flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-white/95 p-2 shadow-lg lg:left-auto">
               <span className="px-1 text-sm font-semibold text-slate-800">
                 {selectedDef.name.replace(/\s*\(folded\)/, "")}

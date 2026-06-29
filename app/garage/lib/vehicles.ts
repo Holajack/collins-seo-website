@@ -213,3 +213,48 @@ export const VEHICLES: Vehicle[] = [
 export function findVehicle(id: string): Vehicle | undefined {
   return VEHICLES.find((v) => v.id === id);
 }
+
+// Exterior dimensions (in): [length, width, height, wheelbase].
+// Approximate published figures, used to render the to-scale 3D body.
+const EXTERIOR: Record<string, [number, number, number, number]> = {
+  sienna: [204, 79, 69, 120],
+  odyssey: [205, 79, 69, 118],
+  pacifica: [204, 80, 70, 121],
+  telluride: [197, 79, 69, 114],
+  highlander: [195, 76, 68, 112],
+  pilot: [200, 79, 71, 113],
+  ascent: [196, 76, 71, 114],
+  rav4: [181, 73, 67, 106],
+  crv: [185, 73, 66, 106],
+  camry: [192, 72, 57, 111],
+};
+
+// Fallback exterior proportions by category, for AI-synthesized vehicles.
+const EXTERIOR_BY_CATEGORY: Record<Vehicle["category"], [number, number, number, number]> = {
+  Minivan: [204, 79, 69, 120],
+  "3-Row SUV": [197, 77, 70, 113],
+  "2-Row SUV": [184, 73, 67, 106],
+  Sedan: [192, 72, 57, 111],
+  Wagon: [190, 73, 60, 108],
+};
+
+export interface Exterior {
+  length: number;
+  width: number;
+  height: number;
+  wheelbase: number;
+}
+
+/** Resolve a vehicle's exterior dimensions, preferring explicit fields, then a
+ *  known model, then a category-based estimate. */
+export function getExterior(v: Vehicle): Exterior {
+  const fromId = EXTERIOR[v.id];
+  const fallback = EXTERIOR_BY_CATEGORY[v.category];
+  const [l, w, h, wb] = fromId ?? fallback;
+  return {
+    length: v.extLength ?? l,
+    width: v.extWidth ?? w,
+    height: v.extHeight ?? h,
+    wheelbase: v.wheelbase ?? wb,
+  };
+}
