@@ -1,0 +1,183 @@
+import type { CatalogItem } from "./types";
+
+// Real-world (approximate) dimensions for common child gear, in inches.
+// Strollers are listed at their FOLDED dimensions, since that is how they
+// travel in a trunk. Car seats are listed at their installed footprint.
+
+export const CAR_SEATS: CatalogItem[] = [
+  {
+    id: "infant",
+    name: "Infant carrier + base",
+    kind: "carseat",
+    category: "Car seat",
+    length: 27,
+    width: 17,
+    height: 24,
+    rearFacingDepth: 27,
+    color: "#2a8fb5",
+    note: "Always rear-facing. Eats the most legroom.",
+  },
+  {
+    id: "convertible",
+    name: "Convertible seat",
+    kind: "carseat",
+    category: "Car seat",
+    length: 22,
+    width: 20,
+    height: 25,
+    rearFacingDepth: 28,
+    color: "#2d8a6e",
+    note: "Rear- or forward-facing. Bulky rear-facing.",
+  },
+  {
+    id: "allinone",
+    name: "All-in-one seat",
+    kind: "carseat",
+    category: "Car seat",
+    length: 24,
+    width: 22,
+    height: 26,
+    rearFacingDepth: 28,
+    color: "#3aad8a",
+    note: "Widest option — 3-across is tight.",
+  },
+  {
+    id: "highbackbooster",
+    name: "High-back booster",
+    kind: "carseat",
+    category: "Car seat",
+    length: 20,
+    width: 19,
+    height: 30,
+    color: "#c4882d",
+    note: "Forward-facing only.",
+  },
+  {
+    id: "backlessbooster",
+    name: "Backless booster",
+    kind: "carseat",
+    category: "Car seat",
+    length: 16,
+    width: 16,
+    height: 12,
+    color: "#d9a04a",
+    note: "Smallest footprint.",
+  },
+];
+
+export const STROLLERS: CatalogItem[] = [
+  {
+    id: "single",
+    name: "Single stroller (folded)",
+    kind: "stroller",
+    category: "Stroller",
+    length: 32,
+    width: 18,
+    height: 12,
+    color: "#1a6b8a",
+  },
+  {
+    id: "double-tandem",
+    name: "Double — tandem (folded)",
+    kind: "stroller",
+    category: "Stroller",
+    length: 38,
+    width: 18,
+    height: 16,
+    color: "#145a75",
+    note: "One seat behind the other.",
+  },
+  {
+    id: "double-side",
+    name: "Double — side-by-side (folded)",
+    kind: "stroller",
+    category: "Stroller",
+    length: 32,
+    width: 30,
+    height: 14,
+    color: "#2a8fb5",
+    note: "Wide — watch the cargo width.",
+  },
+  {
+    id: "triple",
+    name: "Triple stroller (folded)",
+    kind: "stroller",
+    category: "Stroller",
+    length: 42,
+    width: 22,
+    height: 18,
+    color: "#24705a",
+    note: "Long — usually needs seats folded.",
+  },
+  {
+    id: "wagon",
+    name: "Wagon stroller (folded)",
+    kind: "stroller",
+    category: "Stroller",
+    length: 32,
+    width: 18,
+    height: 20,
+    color: "#2d8a6e",
+    note: "e.g. WonderFold / Keenz. Tall when folded.",
+  },
+  {
+    id: "beach-jogger",
+    name: "Beach / jogger — big wheels (folded)",
+    kind: "stroller",
+    category: "Stroller",
+    length: 36,
+    width: 24,
+    height: 16,
+    color: "#c4882d",
+    note: "Oversized wheels make it bulky.",
+  },
+];
+
+export const GEAR: CatalogItem[] = [
+  {
+    id: "carryon",
+    name: "Carry-on suitcase",
+    kind: "gear",
+    category: "Luggage",
+    length: 22,
+    width: 14,
+    height: 9,
+    color: "#5c6878",
+  },
+  {
+    id: "largesuitcase",
+    name: "Large checked suitcase",
+    kind: "gear",
+    category: "Luggage",
+    length: 30,
+    width: 20,
+    height: 12,
+    color: "#424d5b",
+  },
+  {
+    id: "pack-n-play",
+    name: "Pack 'n Play (folded)",
+    kind: "gear",
+    category: "Baby gear",
+    length: 30,
+    width: 10,
+    height: 10,
+    color: "#7a8799",
+  },
+  {
+    id: "groceries",
+    name: "Grocery crate",
+    kind: "gear",
+    category: "Everyday",
+    length: 18,
+    width: 13,
+    height: 12,
+    color: "#9ca8b8",
+  },
+];
+
+export const ALL_ITEMS: CatalogItem[] = [...CAR_SEATS, ...STROLLERS, ...GEAR];
+
+export function findItem(id: string): CatalogItem | undefined {
+  return ALL_ITEMS.find((i) => i.id === id);
+}
