@@ -12,6 +12,7 @@ import {
   type StyleKey,
   type TargetMode,
 } from "./engine";
+import BrewTimer from "./BrewTimer";
 
 type Unit = "oz" | "ml" | "cups";
 const CUP_ML = 240; // a "cup" of coffee ≈ 8 fl oz ≈ 240 ml
@@ -207,7 +208,7 @@ export default function BrewCalculator() {
         {/* Headline numbers */}
         <div className="rounded-2xl border border-[var(--c-border)] bg-gradient-to-br from-[var(--c-accent)]/10 to-transparent p-6 sm:p-7">
           <div className="flex items-baseline justify-between">
-            <h2 className="text-lg font-bold text-[var(--c-ink)]">
+            <h2 className="c-display text-xl font-bold text-[var(--c-ink)]">
               Your recipe
             </h2>
             <span className="rounded-full bg-[var(--c-accent)]/15 px-3 py-1 font-mono text-sm font-semibold text-[var(--c-accent-ink)]">
@@ -302,40 +303,23 @@ export default function BrewCalculator() {
           </div>
         )}
 
-        {/* Pour schedule */}
+        {/* Pour schedule + interactive timer */}
         {result.steps.length > 0 && (
           <div className="rounded-2xl border border-[var(--c-border)] bg-[var(--c-card)] p-6">
-            <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-[var(--c-ink)]">
-                {method.isImmersion ? "Steps" : "Pour schedule"}
+            <div className="mb-5 flex items-center justify-between">
+              <h3 className="c-display text-base font-bold text-[var(--c-ink)]">
+                {method.isImmersion ? "Steps & timer" : "Pour schedule & timer"}
               </h3>
               <span className="text-[12px] text-[var(--c-muted)]">
-                target total ~
-                {formatTime(method.totalBrewTimeSec.high)}
+                target total ~{formatTime(method.totalBrewTimeSec.high)}
               </span>
             </div>
-            <ol className="mt-4 space-y-3">
-              {result.steps.map((step, i) => (
-                <li key={i} className="flex gap-3">
-                  <span className="mt-0.5 w-12 shrink-0 font-mono text-sm font-semibold text-[var(--c-accent-ink)]">
-                    {formatTime(step.atSec)}
-                  </span>
-                  <span className="flex-1">
-                    <span className="flex items-baseline justify-between gap-2">
-                      <span className="text-sm font-semibold text-[var(--c-ink)]">
-                        {step.label}
-                      </span>
-                      <span className="font-mono text-[13px] text-[var(--c-muted)]">
-                        → {step.waterToG} g
-                      </span>
-                    </span>
-                    <span className="block text-[12px] leading-relaxed text-[var(--c-muted)]">
-                      {step.detail}
-                    </span>
-                  </span>
-                </li>
-              ))}
-            </ol>
+            <BrewTimer
+              key={`${methodKey}-${result.ratio}-${result.totalWaterG}`}
+              steps={result.steps}
+              totalSec={method.totalBrewTimeSec.high}
+              isImmersion={method.isImmersion}
+            />
           </div>
         )}
 
