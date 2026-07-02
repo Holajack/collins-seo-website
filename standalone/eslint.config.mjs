@@ -12,8 +12,6 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
-    // Standalone Perfect Brew project (own configs; extracted to its own repo)
-    "standalone/**",
   ]),
 ]);
 
