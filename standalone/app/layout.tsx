@@ -1,5 +1,15 @@
 import type { Metadata, Viewport } from "next";
+import { Alegreya } from "next/font/google";
 import "./globals.css";
+
+// Self-hosted display serif so the editorial voice survives on Android, where
+// the Iowan/Palatino system stack falls back to a generic serif.
+const displaySerif = Alegreya({
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  variable: "--font-display-serif",
+  display: "swap",
+});
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -10,12 +20,11 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL("https://perfect-brew.vercel.app"),
   title: {
-    default:
-      "The Perfect Brew — Pour Over, Chemex, AeroPress & Cold Brew Calculator",
+    default: "The Perfect Brew — Ask for 12 oz. Get 12 oz.",
     template: "%s | The Perfect Brew",
   },
   description:
-    "Enter the cup size you want and your taste style; get the exact coffee dose, water, bloom, temperature, grind, and a live timed pour schedule for V60, Chemex, siphon, AeroPress, and cold brew. Grounded in specialty-coffee brewing science.",
+    "A coffee calculator that solves for the cup, not the kettle. Exact dose, water, bloom, temperature, grind, and a live chiming pour timer for V60, Chemex, siphon, AeroPress, and cold brew — accounting for the water your grounds absorb.",
   keywords: [
     "coffee ratio calculator",
     "pour over calculator",
@@ -28,17 +37,26 @@ export const metadata: Metadata = {
     "brew timer",
   ],
   openGraph: {
-    title: "The Perfect Brew — the perfect cup, every single time",
+    title: "Ask for 12 oz. Get 12 oz. — The Perfect Brew",
     description:
-      "Tell it how much coffee you want in the cup. It gives you the exact dose, the perfect bloom, temperature, grind, and a live pour timer.",
+      "Most calculators tell you how much water to pour. This one tells you how much coffee lands in your cup.",
     type: "website",
     siteName: "The Perfect Brew",
+    images: [
+      {
+        url: "/og.png",
+        width: 1200,
+        height: 630,
+        alt: "Ask for 12 oz. Get 12 oz. — The Perfect Brew coffee calculator",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "The Perfect Brew",
+    title: "Ask for 12 oz. Get 12 oz. — The Perfect Brew",
     description:
-      "The exact dose, bloom, temperature, and a live pour timer — for the cup size you actually want.",
+      "A coffee calculator that solves for the cup, not the kettle — with a live chiming pour timer.",
+    images: ["/og.png"],
   },
   robots: { index: true, follow: true },
 };
@@ -49,7 +67,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={displaySerif.variable}>
       <body>{children}</body>
     </html>
   );

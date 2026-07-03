@@ -157,8 +157,8 @@ const METHODS: Record<BrewMethodKey, BrewMethod & { shortName: string }> = {
     // conflate the concentrate ratio with what you actually drink). The engine
     // brews a strong 1:5 concentrate and derives exactly how much water to cut
     // it with to land on the chosen final strength.
-    styleRatios: { strong: 13, balanced: 15, light: 17 },
-    recommendedRatio: 15,
+    styleRatios: { strong: 7, balanced: 9, light: 11 },
+    recommendedRatio: 9,
     absorptionPerGram: 2.0,
     grind: "Coarse — like raw/turbinado sugar",
     waterTempF: { low: 38, high: 72 },

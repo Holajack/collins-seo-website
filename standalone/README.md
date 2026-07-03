@@ -1,9 +1,21 @@
 # The Perfect Brew
 
+*Ask for 12 oz. Get 12 oz.*
+
 A research-backed coffee calculator + live brew timer. Enter the finished cup
 volume you want and a taste style; get the exact dose, water, bloom,
 temperature, grind, and a timed pour schedule for V60 pour over, Chemex,
 siphon, AeroPress, and cold brew.
+
+The landing page fronts the working tool ("Solve for Cup" structure): the
+calculator is the hero, and the Water Ledger section renders the engine's
+actual equation from live state — proof, not claims.
+
+Timer features: synthesized chime at every pour (works on iPhones, where
+`navigator.vibrate` is a no-op), screen Wake Lock for the length of the brew,
+wall-clock-anchored timing that survives tab hiding, haptic taps where
+supported, and a mute toggle. Recipes serialize to the URL (`Copy recipe
+link`), and the last brew is remembered on-device ("your usual").
 
 What makes the math right:
 
