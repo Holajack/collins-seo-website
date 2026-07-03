@@ -50,6 +50,7 @@ export default function BrewTimer({
   const doneNotifiedRef = useRef(false);
   const audioRef = useRef<AudioContext | null>(null);
   const wakeLockRef = useRef<WakeLockSentinel | null>(null);
+  const wakeLockGenRef = useRef(0);
 
   // The parent remounts this component (via `key`) when the recipe changes, so
   // state naturally resets.
@@ -63,15 +64,26 @@ export default function BrewTimer({
     } catch {}
   }, []);
 
+  // wakeLock.request is async, so a Pause/Reset can land while an acquire is
+  // still in flight — the generation token invalidates stale acquires so a
+  // resolved sentinel from before the release can't keep the screen awake.
   const acquireWakeLock = useCallback(async () => {
+    const gen = ++wakeLockGenRef.current;
     try {
       if ("wakeLock" in navigator) {
-        wakeLockRef.current = await navigator.wakeLock.request("screen");
+        const sentinel = await navigator.wakeLock.request("screen");
+        if (gen !== wakeLockGenRef.current) {
+          sentinel.release().catch(() => {});
+        } else {
+          wakeLockRef.current?.release().catch(() => {});
+          wakeLockRef.current = sentinel;
+        }
       }
     } catch {}
   }, []);
 
   const releaseWakeLock = useCallback(() => {
+    wakeLockGenRef.current++;
     try {
       wakeLockRef.current?.release();
     } catch {}
@@ -112,15 +124,14 @@ export default function BrewTimer({
     };
   }, [running, totalSec, acquireWakeLock]);
 
-  // Release the wake lock and close audio on unmount.
+  // Release the wake lock (including any acquire in flight) and close audio
+  // on unmount.
   useEffect(() => {
     return () => {
-      try {
-        wakeLockRef.current?.release();
-      } catch {}
+      releaseWakeLock();
       audioRef.current?.close().catch(() => {});
     };
-  }, []);
+  }, [releaseWakeLock]);
 
   // Which step are we in?
   let activeIdx = -1;
@@ -130,13 +141,23 @@ export default function BrewTimer({
   const activeStep = activeIdx >= 0 ? steps[activeIdx] : null;
   const nextStep = activeIdx + 1 < steps.length ? steps[activeIdx + 1] : null;
 
-  // Chime + haptic tap when we cross into a new step.
+  // Chime + haptic tap when we cross into a new step — including steps
+  // crossed in one catch-up jump after the tab was frozen, and the final step
+  // when the same compute() also stops the clock (so this gates on the start
+  // anchor, not `running`; the anchor is nulled on reset).
   useEffect(() => {
-    if (!running) return;
-    if (activeIdx !== lastStepRef.current && activeIdx >= 0) {
-      lastStepRef.current = activeIdx;
-      if ("vibrate" in navigator) navigator.vibrate?.(60);
-      if (!muted && audioRef.current) playChime(audioRef.current, "pour");
+    if (startAnchorRef.current == null) return;
+    const prev = lastStepRef.current;
+    if (activeIdx <= prev) return;
+    lastStepRef.current = activeIdx;
+    if ("vibrate" in navigator) navigator.vibrate?.(60);
+    if (!muted && audioRef.current) {
+      const ctx = audioRef.current;
+      for (let i = prev + 1; i <= activeIdx; i++) {
+        const delayMs = (i - prev - 1) * 400;
+        if (delayMs === 0) playChime(ctx, "pour");
+        else window.setTimeout(() => playChime(ctx, "pour"), delayMs);
+      }
     }
   }, [activeIdx, running, muted]);
 
@@ -179,6 +200,7 @@ export default function BrewTimer({
   const handleReset = () => {
     setRunning(false);
     setElapsed(0);
+    startAnchorRef.current = null;
     lastStepRef.current = -1;
     doneNotifiedRef.current = false;
     releaseWakeLock();

@@ -284,7 +284,11 @@ function buildPourSchedule(
 }
 
 export function formatTime(totalSec: number): string {
-  const m = Math.floor(totalSec / 60);
-  const s = Math.round(totalSec % 60);
+  // Derive minutes and seconds from the same floored integer — rounding the
+  // remainder alone renders impossible times like "0:60" for fractional
+  // inputs (the live timer feeds this every frame).
+  const t = Math.floor(totalSec);
+  const m = Math.floor(t / 60);
+  const s = t % 60;
   return `${m}:${s.toString().padStart(2, "0")}`;
 }

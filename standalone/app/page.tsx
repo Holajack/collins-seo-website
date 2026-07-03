@@ -152,9 +152,11 @@ export default function HomePage() {
             {FAQS.map((f, i) => (
               <details
                 key={i}
-                className="group rounded-xl border border-[var(--c-border)] bg-[var(--c-card)] px-5 py-4"
+                className="group rounded-xl border border-[var(--c-border)] bg-[var(--c-card)]"
               >
-                <summary className="cursor-pointer list-none text-[15px] font-semibold text-[var(--c-ink)] marker:content-none">
+                {/* Padding lives on the summary so the whole visible row is
+                    the tap target, not just the text line. */}
+                <summary className="cursor-pointer list-none px-5 py-4 text-[15px] font-semibold text-[var(--c-ink)] marker:content-none">
                   <span className="flex items-center justify-between gap-3">
                     {f.q}
                     <span
@@ -165,7 +167,7 @@ export default function HomePage() {
                     </span>
                   </span>
                 </summary>
-                <p className="mt-3 text-[14px] leading-relaxed text-[var(--c-muted)]">
+                <p className="px-5 pb-4 text-[14px] leading-relaxed text-[var(--c-muted)]">
                   {f.a}
                 </p>
               </details>

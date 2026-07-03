@@ -10,8 +10,16 @@
 }
 
 html {
-  scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+}
+
+/* Smooth-scroll only user-initiated in-page jumps (clicking an anchor focuses
+   it, setting :focus-within). A fresh page load with a #fragment has no focus,
+   so the initial jump is instant instead of an interruptible animation. */
+@media (prefers-reduced-motion: no-preference) {
+  html:focus-within {
+    scroll-behavior: smooth;
+  }
 }
 
 body {

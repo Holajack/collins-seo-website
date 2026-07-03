@@ -44,7 +44,9 @@ function parseState(params: URLSearchParams): Partial<BrewState> | null {
   const s = params.get("s");
   if (s && STYLES.some((x) => x.key === s)) out.s = s as StyleKey;
   const a = Number(params.get("a"));
-  if (Number.isFinite(a) && a > 0 && a <= 1000) out.a = a;
+  // Clamp rather than drop, so a shared 1.5 L cold-brew batch never silently
+  // reverts to the 12-unit default (20000 covers 20 L in ml).
+  if (Number.isFinite(a) && a > 0) out.a = Math.min(a, 20000);
   const u = params.get("u");
   if (u && UNITS.includes(u as Unit)) out.u = u as Unit;
   const mode = params.get("mode");
@@ -64,7 +66,9 @@ export default function BrewCalculator() {
   const [customRatio, setCustomRatio] = useState<number>(16);
   const [usualLoaded, setUsualLoaded] = useState(false);
   const [copied, setCopied] = useState(false);
-  const bootedRef = useRef(false);
+  // Only a real user interaction may write the "usual" or rewrite the URL —
+  // merely opening a shared link must never overwrite the saved recipe.
+  const dirtyRef = useRef(false);
 
   const method = BREW_METHODS[methodKey];
 
@@ -93,8 +97,10 @@ export default function BrewCalculator() {
   };
 
   // On mount: a shared link's URL params win; otherwise restore "your usual"
-  // from this device. SSR must render the defaults (URL/storage don't exist
-  // server-side), so this state can only be applied after hydration.
+  // from this device — run through the same validator as the URL path, since
+  // a stale/foreign stored value must degrade to defaults, not crash. SSR
+  // must render the defaults (URL/storage don't exist server-side), so this
+  // state can only be applied after hydration.
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     try {
@@ -104,27 +110,41 @@ export default function BrewCalculator() {
       } else {
         const raw = window.localStorage.getItem(USUAL_KEY);
         if (raw) {
-          const saved = JSON.parse(raw) as Partial<BrewState>;
-          applyState(saved);
-          setUsualLoaded(true);
+          const obj: unknown = JSON.parse(raw);
+          if (obj && typeof obj === "object") {
+            const qs = new URLSearchParams();
+            for (const [k, v] of Object.entries(obj)) {
+              if (v != null) qs.set(k, String(v));
+            }
+            const saved = parseState(qs);
+            if (saved) {
+              applyState(saved);
+              setUsualLoaded(true);
+            }
+          }
         }
       }
     } catch {}
-    bootedRef.current = true;
+    // Mount-only by design; applyState is stable in behavior.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   /* eslint-enable react-hooks/set-state-in-effect */
 
-  // After boot: keep the URL shareable and remember the recipe on this device.
-  // The first run fires in the same commit as the boot effect (before any
-  // re-render applies loaded state), so skip it — a visitor who never touches
-  // a control shouldn't get a phantom "usual" or a parameter-stuffed URL.
-  const firstSaveRef = useRef(true);
+  const serializeParams = () => {
+    const params = new URLSearchParams();
+    params.set("m", methodKey);
+    params.set("s", style);
+    params.set("a", String(amount));
+    params.set("u", unit);
+    if (!BREW_METHODS[methodKey].coldBrew) params.set("mode", targetMode);
+    if (useCustomRatio) params.set("r", String(customRatio));
+    return params;
+  };
+
+  // After any real interaction: keep the URL shareable and remember the
+  // recipe on this device.
   useEffect(() => {
-    if (!bootedRef.current) return;
-    if (firstSaveRef.current) {
-      firstSaveRef.current = false;
-      return;
-    }
+    if (!dirtyRef.current) return;
     const state: BrewState = {
       m: methodKey,
       s: style,
@@ -144,9 +164,17 @@ export default function BrewCalculator() {
     if (!BREW_METHODS[state.m].coldBrew) params.set("mode", state.mode);
     if (state.r != null) params.set("r", String(state.r));
     try {
-      window.history.replaceState(null, "", `?${params.toString()}`);
+      window.history.replaceState(
+        null,
+        "",
+        `?${params.toString()}${window.location.hash}`
+      );
     } catch {}
   }, [methodKey, style, amount, unit, targetMode, useCustomRatio, customRatio]);
+
+  const markDirty = () => {
+    dirtyRef.current = true;
+  };
 
   const targetMl = useMemo(() => {
     if (unit === "oz") return ozToMl(amount);
@@ -174,15 +202,19 @@ export default function BrewCalculator() {
     ? round(result.finishedVolumeMl - (result.brewWaterG - result.absorbedG))
     : 0;
 
+  // Serialize current state explicitly — location.href stays clean until an
+  // interaction, and a "usual"-restored recipe never writes the URL at all.
   const copyLink = async () => {
     try {
-      await navigator.clipboard.writeText(window.location.href);
+      const url = `${window.location.origin}${window.location.pathname}?${serializeParams().toString()}`;
+      await navigator.clipboard.writeText(url);
       setCopied(true);
       window.setTimeout(() => setCopied(false), 2000);
     } catch {}
   };
 
   const selectMethod = (k: BrewMethodKey) => {
+    markDirty();
     setMethodKey(k);
     // Keep a custom ratio inside the new method's sensible range.
     const bounds = BREW_METHODS[k].coldBrew
@@ -232,21 +264,29 @@ export default function BrewCalculator() {
           <div>
             <label className="c-label">
               How much do you want{" "}
-              {targetMode === "cup" ? "in the cup" : "of total water"}?
+              {method.coldBrew || targetMode === "cup"
+                ? "in the cup"
+                : "of total water"}?
             </label>
             <div className="mt-3 flex gap-2">
               <input
                 type="number"
                 min={1}
                 value={amount}
-                onChange={(e) => setAmount(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => {
+                  markDirty();
+                  setAmount(Math.max(0, Number(e.target.value)));
+                }}
                 className="w-full rounded-xl border border-[var(--c-border)] bg-[var(--c-bg)] px-4 py-3 text-lg font-semibold text-[var(--c-ink)] outline-none focus:border-[var(--c-accent)]"
               />
               <div className="flex overflow-hidden rounded-xl border border-[var(--c-border)]">
                 {UNITS.map((u) => (
                   <button
                     key={u}
-                    onClick={() => setUnit(u)}
+                    onClick={() => {
+                      markDirty();
+                      setUnit(u);
+                    }}
                     className={`px-3 text-sm font-medium transition ${
                       unit === u
                         ? "bg-[var(--c-accent)] text-white"
@@ -267,12 +307,18 @@ export default function BrewCalculator() {
                 <>
                   <ModeChip
                     active={targetMode === "cup"}
-                    onClick={() => setTargetMode("cup")}
+                    onClick={() => {
+                      markDirty();
+                      setTargetMode("cup");
+                    }}
                     label="Finished in cup"
                   />
                   <ModeChip
                     active={targetMode === "water"}
-                    onClick={() => setTargetMode("water")}
+                    onClick={() => {
+                      markDirty();
+                      setTargetMode("water");
+                    }}
                     label="Total water"
                   />
                 </>
@@ -288,6 +334,7 @@ export default function BrewCalculator() {
                 <button
                   key={s.key}
                   onClick={() => {
+                    markDirty();
                     setStyle(s.key);
                     setUseCustomRatio(false);
                   }}
@@ -314,11 +361,12 @@ export default function BrewCalculator() {
 
             {/* Custom ratio */}
             <div className="mt-3 rounded-xl border border-[var(--c-border)] p-4">
-              <label className="flex items-center gap-2 text-sm font-medium text-[var(--c-ink)]">
+              <label className="flex min-h-[40px] cursor-pointer items-center gap-2 text-sm font-medium text-[var(--c-ink)]">
                 <input
                   type="checkbox"
                   checked={useCustomRatio}
                   onChange={(e) => {
+                    markDirty();
                     setUseCustomRatio(e.target.checked);
                     if (
                       e.target.checked &&
@@ -345,7 +393,10 @@ export default function BrewCalculator() {
                     max={ratioBounds.max}
                     step={0.5}
                     value={customRatio}
-                    onChange={(e) => setCustomRatio(Number(e.target.value))}
+                    onChange={(e) => {
+                      markDirty();
+                      setCustomRatio(Number(e.target.value));
+                    }}
                     className="mt-2 w-full accent-[var(--c-accent)]"
                   />
                   <div className="flex justify-between text-[11px] text-[var(--c-muted)]">
@@ -369,7 +420,7 @@ export default function BrewCalculator() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={copyLink}
-                  className="rounded-full border border-[var(--c-accent)]/40 px-3.5 py-1 text-[12px] font-semibold text-[var(--c-accent-ink)] transition hover:bg-[var(--c-accent)]/10 active:scale-95"
+                  className="inline-flex min-h-[40px] items-center rounded-full border border-[var(--c-accent)]/40 px-3.5 py-1 text-[12px] font-semibold text-[var(--c-accent-ink)] transition hover:bg-[var(--c-accent)]/10 active:scale-95"
                 >
                   {copied ? "Link copied" : "Copy recipe link"}
                 </button>
@@ -533,8 +584,10 @@ function WaterLedger({
   const absorption = m.absorptionPerGram;
   // Derive displayed splits from the already-rounded headline figures so the
   // ledger always sums exactly — independent rounding must never make this
-  // page disagree with itself by a gram.
+  // page disagree with itself by a gram. For the hot flow, "held" is the gap
+  // between the two endpoints the user actually sees (water in, cup out).
   const brewShownG = round(result.totalWaterG - result.bloomWaterG);
+  const heldShownG = round(result.totalWaterG - result.finishedVolumeMl);
   const concentrateOutG = round(result.brewWaterG - result.absorbedG);
   const dilutionShownG = round(result.finishedVolumeMl - concentrateOutG);
 
@@ -555,7 +608,7 @@ function WaterLedger({
       <p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-[var(--c-muted)]">
         Your grounds hold on to about {absorption} g of water for every gram of
         coffee. A calculator that ignores that shorts your cup by{" "}
-        {result.absorbedG} g.{" "}
+        {result.coldBrew ? result.absorbedG : heldShownG} g.{" "}
         {mode === "cup"
           ? "This one solves for the cup:"
           : "In total-water mode, the cup is what survives:"}
@@ -625,7 +678,7 @@ function WaterLedger({
             <LedgerArrow />
             <LedgerCell
               label="Held by the grounds"
-              value={`−${result.absorbedG} g`}
+              value={`−${heldShownG} g`}
               sub={`${absorption} g per gram of coffee`}
               negative
             />
@@ -732,7 +785,7 @@ function ModeChip({
   return (
     <button
       onClick={onClick}
-      className={`rounded-full border px-3 py-1 text-[12px] font-medium transition ${
+      className={`inline-flex min-h-[40px] items-center rounded-full border px-3 py-1 text-[12px] font-medium transition ${
         active
           ? "border-[var(--c-accent)] bg-[var(--c-accent)]/10 text-[var(--c-accent-ink)]"
           : "border-[var(--c-border)] text-[var(--c-muted)] hover:border-[var(--c-accent)]/50"
