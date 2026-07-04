@@ -1,5 +1,7 @@
 import BrewCalculator from "./BrewCalculator";
 import PourOverArt from "./PourOverArt";
+import CoffeeTheme from "./CoffeeTheme";
+import SiteHeader from "./SiteHeader";
 import { BREW_METHODS, type BrewMethodKey } from "./brew-data";
 import { formatTime } from "./engine";
 
@@ -38,17 +40,7 @@ const FAQS: { q: string; a: string }[] = [
 export default function HomePage() {
   return (
     <div className="c-scope min-h-screen bg-[var(--c-bg)] text-[var(--c-ink)]">
-      <header className="sticky top-0 z-20 border-b border-[var(--c-border)] bg-[var(--c-bg)]/85 backdrop-blur-md">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-5 py-4 sm:px-8">
-          <span className="flex items-center gap-2 font-semibold tracking-tight">
-            <CupMark />
-            <span className="c-display text-[17px]">The Perfect Brew</span>
-          </span>
-          <span className="hidden text-[12px] text-[var(--c-muted)] sm:inline">
-            Every gram, accounted for.
-          </span>
-        </div>
-      </header>
+      <SiteHeader active="/" />
 
       {/* Hero */}
       <section className="relative overflow-hidden border-b border-[var(--c-border)]">
@@ -212,84 +204,8 @@ export default function HomePage() {
         </div>
       </footer>
 
-      {/* Coffee-shop palette + editorial type. */}
-      <style>{`
-        .c-scope {
-          --c-bg: #faf6f0;
-          --c-card: #ffffff;
-          --c-ink: #2b2018;
-          --c-muted: #8a7a6c;
-          --c-border: #e8ddd0;
-          --c-accent: #b06a3b;
-          --c-accent-ink: #8a4f29;
-          --c-display: var(--font-display-serif), "Iowan Old Style",
-            "Palatino Linotype", Palatino, "Book Antiqua", "Hoefler Text",
-            Georgia, ui-serif, serif;
-        }
-        @media (prefers-color-scheme: dark) {
-          .c-scope {
-            --c-bg: #16110c;
-            --c-card: #211a13;
-            --c-ink: #f3ece2;
-            --c-muted: #b3a392;
-            --c-border: #382c20;
-            --c-accent: #d08a52;
-            --c-accent-ink: #e6ad7a;
-          }
-        }
-        .c-scope .c-display {
-          font-family: var(--c-display);
-          letter-spacing: -0.01em;
-        }
-        .c-scope .c-label {
-          font-size: 11px;
-          font-weight: 600;
-          letter-spacing: 0.05em;
-          text-transform: uppercase;
-          color: var(--c-muted);
-        }
-        @keyframes c-pulse-kf {
-          0%, 100% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.55; transform: scale(1.04); }
-        }
-        .c-scope .c-pulse {
-          animation: c-pulse-kf 1s ease-in-out infinite;
-          transform-origin: left center;
-        }
-        @keyframes c-steam-kf {
-          0% { opacity: 0; transform: translateY(6px) scaleX(0.9); }
-          35% { opacity: 0.7; }
-          100% { opacity: 0; transform: translateY(-26px) scaleX(1.15); }
-        }
-        .c-scope .c-steam path {
-          animation: c-steam-kf 4.5s ease-in-out infinite;
-          transform-origin: center bottom;
-        }
-        .c-scope .c-steam path:nth-child(2) { animation-delay: 1.5s; }
-        .c-scope .c-steam path:nth-child(3) { animation-delay: 3s; }
-        @media (prefers-reduced-motion: reduce) {
-          .c-scope .c-pulse, .c-scope .c-steam path { animation: none; }
-        }
-      `}</style>
+      <CoffeeTheme />
     </div>
   );
 }
 
-function CupMark() {
-  return (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="var(--c-accent-ink)"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M5 8h11v5a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4V8z" />
-      <path d="M16 9h2a2 2 0 0 1 0 4h-2" />
-      <path d="M8 2c-.5 1 .5 1.5 0 2.5M11 2c-.5 1 .5 1.5 0 2.5" />
-    </svg>
-  );
-}

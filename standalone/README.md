@@ -17,6 +17,22 @@ wall-clock-anchored timing that survives tab hiding, haptic taps where
 supported, and a mute toggle. Recipes serialize to the URL (`Copy recipe
 link`), and the last brew is remembered on-device ("your usual").
 
+Beyond the calculator:
+
+- **Capacity-aware brewers** (`app/brewers.ts`): pick your actual hardware —
+  AeroPress Original/Go/Clear/XL, V60 01/02/03, Chemex 3–10 cup, Hario/Yama
+  siphons, cold brew vessels — and the math respects its real capacity. An
+  over-size AeroPress brew automatically becomes a concentrate + bypass plan
+  with its own timer steps; siphons warn at the bulb's hard cap; pour-overs
+  suggest the right size.
+- **Custom dose mode**: enter total coffee (g) and total water (g) directly;
+  the ratio, cup yield, bloom, and schedule derive from your dose.
+- **Brew journal** (`/journal`): beans, roaster, rating, notes — stored in
+  localStorage only. No account.
+- **Florida beans & shops** (`/beans`): real specialty roasters researched
+  from their live websites by a multi-agent sweep with per-shop verification
+  (`app/florida-coffee.ts`).
+
 What makes the math right:
 
 - **Finished-cup solve.** Grounds retain ~2 g water per 1 g coffee, so naive

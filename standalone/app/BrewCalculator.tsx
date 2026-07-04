@@ -15,6 +15,13 @@ import {
   type TargetMode,
 } from "./engine";
 import BrewTimer from "./BrewTimer";
+import {
+  assessFit,
+  buildBypassSteps,
+  calculateFromDose,
+} from "./engine";
+import { brewersFor, getBrewer } from "./brewers";
+import { newId, saveEntry } from "./journal-store";
 
 type Unit = "oz" | "ml" | "cups";
 const CUP_ML = 240; // a "cup" of coffee ≈ 8 fl oz ≈ 240 ml
@@ -33,6 +40,10 @@ interface BrewState {
   u: Unit;
   mode: TargetMode;
   r?: number; // custom ratio, only when enabled
+  im?: "cup" | "dose"; // input mode; default cup
+  c?: number; // dose mode: coffee grams
+  w?: number; // dose mode: water grams
+  b?: string; // brewer id
 }
 
 const UNITS: Unit[] = ["oz", "ml", "cups"];
@@ -53,6 +64,14 @@ function parseState(params: URLSearchParams): Partial<BrewState> | null {
   if (mode === "cup" || mode === "water") out.mode = mode;
   const r = Number(params.get("r"));
   if (Number.isFinite(r) && r >= 4 && r <= 25) out.r = r;
+  const im = params.get("im");
+  if (im === "dose") out.im = "dose";
+  const c = Number(params.get("c"));
+  if (Number.isFinite(c) && c > 0) out.c = Math.min(c, 500);
+  const w = Number(params.get("w"));
+  if (Number.isFinite(w) && w > 0) out.w = Math.min(w, 20000);
+  const b = params.get("b");
+  if (b && getBrewer(b)) out.b = b;
   return Object.keys(out).length > 0 ? out : null;
 }
 
@@ -64,7 +83,17 @@ export default function BrewCalculator() {
   const [targetMode, setTargetMode] = useState<TargetMode>("cup");
   const [useCustomRatio, setUseCustomRatio] = useState(false);
   const [customRatio, setCustomRatio] = useState<number>(16);
+  const [inputMode, setInputMode] = useState<"cup" | "dose">("cup");
+  const [doseCoffeeG, setDoseCoffeeG] = useState<number>(25);
+  const [doseWaterG, setDoseWaterG] = useState<number>(400);
+  const [brewerId, setBrewerId] = useState<string>("");
   const [usualLoaded, setUsualLoaded] = useState(false);
+  const [logOpen, setLogOpen] = useState(false);
+  const [logSaved, setLogSaved] = useState(false);
+  const [logBeans, setLogBeans] = useState("");
+  const [logRoaster, setLogRoaster] = useState("");
+  const [logRating, setLogRating] = useState(0);
+  const [logNotes, setLogNotes] = useState("");
   const [copied, setCopied] = useState(false);
   // Only a real user interaction may write the "usual" or rewrite the URL —
   // merely opening a shared link must never overwrite the saved recipe.
@@ -93,6 +122,13 @@ export default function BrewCalculator() {
         : { min: 12, max: 20 };
       setCustomRatio(Math.min(bounds.max, Math.max(bounds.min, s.r)));
       setUseCustomRatio(true);
+    }
+    if (s.im === "dose") setInputMode("dose");
+    if (s.c != null) setDoseCoffeeG(s.c);
+    if (s.w != null) setDoseWaterG(s.w);
+    if (s.b) {
+      const bw = getBrewer(s.b);
+      if (bw && bw.methodKey === targetMethod) setBrewerId(s.b);
     }
   };
 
@@ -133,11 +169,18 @@ export default function BrewCalculator() {
   const serializeParams = () => {
     const params = new URLSearchParams();
     params.set("m", methodKey);
-    params.set("s", style);
-    params.set("a", String(amount));
-    params.set("u", unit);
-    if (!BREW_METHODS[methodKey].coldBrew) params.set("mode", targetMode);
-    if (useCustomRatio) params.set("r", String(customRatio));
+    if (inputMode === "dose") {
+      params.set("im", "dose");
+      params.set("c", String(doseCoffeeG));
+      params.set("w", String(doseWaterG));
+    } else {
+      params.set("s", style);
+      params.set("a", String(amount));
+      params.set("u", unit);
+      if (!BREW_METHODS[methodKey].coldBrew) params.set("mode", targetMode);
+      if (useCustomRatio) params.set("r", String(customRatio));
+    }
+    if (brewerId) params.set("b", brewerId);
     return params;
   };
 
@@ -152,17 +195,15 @@ export default function BrewCalculator() {
       u: unit,
       mode: targetMode,
       ...(useCustomRatio ? { r: customRatio } : {}),
+      ...(inputMode === "dose"
+        ? { im: "dose" as const, c: doseCoffeeG, w: doseWaterG }
+        : {}),
+      ...(brewerId ? { b: brewerId } : {}),
     };
     try {
       window.localStorage.setItem(USUAL_KEY, JSON.stringify(state));
     } catch {}
-    const params = new URLSearchParams();
-    params.set("m", state.m);
-    params.set("s", state.s);
-    params.set("a", String(state.a));
-    params.set("u", state.u);
-    if (!BREW_METHODS[state.m].coldBrew) params.set("mode", state.mode);
-    if (state.r != null) params.set("r", String(state.r));
+    const params = serializeParams();
     try {
       window.history.replaceState(
         null,
@@ -170,7 +211,8 @@ export default function BrewCalculator() {
         `?${params.toString()}${window.location.hash}`
       );
     } catch {}
-  }, [methodKey, style, amount, unit, targetMode, useCustomRatio, customRatio]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [methodKey, style, amount, unit, targetMode, useCustomRatio, customRatio, inputMode, doseCoffeeG, doseWaterG, brewerId]);
 
   const markDirty = () => {
     dirtyRef.current = true;
@@ -184,15 +226,34 @@ export default function BrewCalculator() {
 
   const result = useMemo(
     () =>
-      calculateBrew(
-        method,
-        style,
-        targetMl,
-        targetMode,
-        useCustomRatio ? customRatio : undefined
-      ),
-    [method, style, targetMl, targetMode, useCustomRatio, customRatio]
+      inputMode === "dose"
+        ? calculateFromDose(method, doseCoffeeG, doseWaterG)
+        : calculateBrew(
+            method,
+            style,
+            targetMl,
+            targetMode,
+            useCustomRatio ? customRatio : undefined
+          ),
+    [method, style, targetMl, targetMode, useCustomRatio, customRatio, inputMode, doseCoffeeG, doseWaterG]
   );
+
+  // Capacity fit against the chosen brewer (if any), and the steps the timer
+  // should walk — an over-capacity AeroPress switches to concentrate+bypass.
+  const brewer = brewerId ? getBrewer(brewerId) : undefined;
+  const activeBrewer = brewer && brewer.methodKey === methodKey ? brewer : undefined;
+  const fit = activeBrewer ? assessFit(result, activeBrewer) : null;
+  const timerSteps =
+    fit?.plan === "bypass" && fit.bypass
+      ? buildBypassSteps(
+          result.coffeeG,
+          fit.bypass.chamberWaterG,
+          fit.bypass.bypassWaterG,
+          method.bloom.waterMultiplier || 2,
+          method.bloom.timeSec || 30,
+          method.totalBrewTimeSec.high
+        )
+      : result.steps;
 
   const ratioLabel = `1:${result.ratio}`;
 
@@ -258,9 +319,105 @@ export default function BrewCalculator() {
             <p className="mt-3 text-[13px] leading-relaxed text-[var(--c-muted)]">
               {method.blurb}
             </p>
+            <div className="mt-3">
+              <label className="c-label" htmlFor="brewer-select">
+                Your brewer (for capacity-aware math)
+              </label>
+              <select
+                id="brewer-select"
+                value={brewerId}
+                onChange={(e) => {
+                  markDirty();
+                  setBrewerId(e.target.value);
+                }}
+                className="mt-2 w-full rounded-xl border border-[var(--c-border)] bg-[var(--c-bg)] px-3.5 py-3 text-[14px] text-[var(--c-ink)] outline-none focus:border-[var(--c-accent)]"
+              >
+                <option value="">No specific brewer</option>
+                {brewersFor(methodKey).map((b) => (
+                  <option key={b.id} value={b.id}>
+                    {b.brand} {b.model} ({b.variant}) — {b.maxWaterMl} ml
+                  </option>
+                ))}
+              </select>
+              {activeBrewer && (
+                <p className="mt-1.5 text-[12px] leading-relaxed text-[var(--c-muted)]">
+                  {activeBrewer.note}
+                </p>
+              )}
+            </div>
           </div>
 
+          {/* Input mode */}
+          <div>
+            <label className="c-label">How do you want to plan it?</label>
+            <div className="mt-2 flex gap-2">
+              <ModeChip
+                active={inputMode === "cup"}
+                onClick={() => {
+                  markDirty();
+                  setInputMode("cup");
+                }}
+                label="By cup size"
+              />
+              <ModeChip
+                active={inputMode === "dose"}
+                onClick={() => {
+                  markDirty();
+                  setInputMode("dose");
+                }}
+                label="Custom dose (g)"
+              />
+            </div>
+          </div>
+
+          {inputMode === "dose" && (
+            <div>
+              <label className="c-label">Your dose — it derives the ratio</label>
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                <div>
+                  <div className="text-[12px] text-[var(--c-muted)]">Coffee (g)</div>
+                  <input
+                    type="number"
+                    min={1}
+                    step={0.5}
+                    value={doseCoffeeG}
+                    onChange={(e) => {
+                      markDirty();
+                      setDoseCoffeeG(Math.max(0, Number(e.target.value)));
+                    }}
+                    className="mt-1 w-full rounded-xl border border-[var(--c-border)] bg-[var(--c-bg)] px-4 py-3 text-lg font-semibold text-[var(--c-ink)] outline-none focus:border-[var(--c-accent)]"
+                  />
+                </div>
+                <div>
+                  <div className="text-[12px] text-[var(--c-muted)]">Water (g)</div>
+                  <input
+                    type="number"
+                    min={1}
+                    step={5}
+                    value={doseWaterG}
+                    onChange={(e) => {
+                      markDirty();
+                      setDoseWaterG(Math.max(0, Number(e.target.value)));
+                    }}
+                    className="mt-1 w-full rounded-xl border border-[var(--c-border)] bg-[var(--c-bg)] px-4 py-3 text-lg font-semibold text-[var(--c-ink)] outline-none focus:border-[var(--c-accent)]"
+                  />
+                </div>
+              </div>
+              <p className="mt-2 text-[12px] leading-relaxed text-[var(--c-muted)]">
+                That works out to{" "}
+                <span className="font-mono font-semibold text-[var(--c-accent-ink)]">
+                  1:{result.ratio}
+                </span>{" "}
+                —{" "}
+                {method.coldBrew
+                  ? `steep water for a concentrate; dilute the strained yield to taste.`
+                  : `about ${result.finishedVolumeOz} oz (${result.finishedVolumeMl} ml) in the cup after the grounds keep their share.`}
+              </p>
+            </div>
+          )}
+
           {/* Amount */}
+          {inputMode === "cup" && (
           <div>
             <label className="c-label">
               How much do you want{" "}
@@ -325,8 +482,10 @@ export default function BrewCalculator() {
               )}
             </div>
           </div>
+          )}
 
           {/* Style */}
+          {inputMode === "cup" && (
           <div>
             <label className="c-label">Taste style</label>
             <div className="mt-3 space-y-2">
@@ -407,6 +566,7 @@ export default function BrewCalculator() {
               )}
             </div>
           </div>
+          )}
         </div>
 
         {/* ───────────── Recipe ───────────── */}
@@ -458,6 +618,47 @@ export default function BrewCalculator() {
             </p>
           </div>
 
+          {/* Capacity fit */}
+          {fit && activeBrewer && (
+            <div
+              className={`rounded-2xl border p-5 ${
+                fit.fits
+                  ? "border-[var(--c-border)] bg-[var(--c-card)]"
+                  : "border-[var(--c-accent)]/40 bg-[var(--c-accent)]/[0.07]"
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <FitIcon ok={fit.fits} />
+                <h3 className="text-[14px] font-bold text-[var(--c-ink)]">
+                  {fit.fits
+                    ? `Fits your ${activeBrewer.brand} ${activeBrewer.model}`
+                    : fit.plan === "bypass"
+                    ? "Too big for the chamber — bypass plan"
+                    : fit.plan === "reduce"
+                    ? "Over this brewer's capacity"
+                    : "Pick a bigger size"}
+                </h3>
+              </div>
+              <p className="mt-2 text-[13px] leading-relaxed text-[var(--c-muted)]">
+                {fit.message}
+              </p>
+              {fit.plan === "bypass" && fit.bypass && (
+                <div className="mt-3 grid grid-cols-2 gap-4">
+                  <Stat
+                    label="In the chamber"
+                    value={`${fit.bypass.chamberWaterG} g`}
+                    sub="brews the concentrate"
+                  />
+                  <Stat
+                    label="Bypass after press"
+                    value={`+${fit.bypass.bypassWaterG} g`}
+                    sub="hot water into the cup"
+                  />
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Bloom */}
           {method.bloom.applies && (
             <div className="rounded-2xl border border-[var(--c-accent)]/30 bg-[var(--c-accent)]/[0.06] p-6">
@@ -503,22 +704,26 @@ export default function BrewCalculator() {
                 />
                 <Stat
                   label="Then dilute"
-                  value={`+${coldDilutionShownG} g`}
-                  sub="cold water or milk"
+                  value={
+                    inputMode === "dose" ? "to taste" : `+${coldDilutionShownG} g`
+                  }
+                  sub={
+                    inputMode === "dose"
+                      ? "you set the steep water directly"
+                      : "cold water or milk"
+                  }
                 />
               </div>
               <p className="mt-3 text-[13px] leading-relaxed text-[var(--c-muted)]">
-                Steep {result.coffeeG} g of coarse grounds in{" "}
-                {result.coldBrew.concentrateWaterG} g of cold water (a strong 1:5
-                concentrate). Strain, then add {coldDilutionShownG} g of cold
-                water or milk to land on your {ratioLabel} strength —{" "}
-                {result.finishedVolumeOz} oz in the glass.
+                {inputMode === "dose"
+                  ? `Steep ${result.coffeeG} g of coarse grounds in ${result.coldBrew.concentrateWaterG} g of cold water (${ratioLabel}). After straining you'll have about ${result.finishedVolumeMl} ml — dilute each glass to taste.`
+                  : `Steep ${result.coffeeG} g of coarse grounds in ${result.coldBrew.concentrateWaterG} g of cold water (a strong 1:5 concentrate). Strain, then add ${coldDilutionShownG} g of cold water or milk to land on your ${ratioLabel} strength — ${result.finishedVolumeOz} oz in the glass.`}
               </p>
             </div>
           )}
 
           {/* Pour schedule + interactive timer */}
-          {result.steps.length > 0 && (
+          {timerSteps.length > 0 && (
             <div className="rounded-2xl border border-[var(--c-border)] bg-[var(--c-card)] p-6">
               <div className="mb-5 flex items-center justify-between">
                 <h3 className="c-display text-base font-bold text-[var(--c-ink)]">
@@ -529,13 +734,129 @@ export default function BrewCalculator() {
                 </span>
               </div>
               <BrewTimer
-                key={`${methodKey}-${result.ratio}-${result.totalWaterG}`}
-                steps={result.steps}
+                key={`${methodKey}-${result.ratio}-${result.totalWaterG}-${fit?.plan ?? "none"}`}
+                steps={timerSteps}
                 totalSec={method.totalBrewTimeSec.high}
                 isImmersion={method.isImmersion}
               />
             </div>
           )}
+
+          {/* Log this brew */}
+          <div className="rounded-2xl border border-[var(--c-border)] bg-[var(--c-card)] p-6">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h3 className="c-display text-base font-bold text-[var(--c-ink)]">
+                Log this brew
+              </h3>
+              {!logOpen && (
+                <button
+                  onClick={() => {
+                    setLogOpen(true);
+                    setLogSaved(false);
+                  }}
+                  className="inline-flex min-h-[40px] items-center rounded-full border border-[var(--c-accent)]/40 px-4 text-[12px] font-semibold text-[var(--c-accent-ink)] transition hover:bg-[var(--c-accent)]/10"
+                >
+                  {logSaved ? "Log another" : "Add to journal"}
+                </button>
+              )}
+            </div>
+            {logSaved && !logOpen && (
+              <p className="mt-2 text-[13px] text-[var(--c-muted)]">
+                Saved to your on-device journal.{" "}
+                <a
+                  href="/journal"
+                  className="font-medium text-[var(--c-accent-ink)] underline underline-offset-2"
+                >
+                  View journal
+                </a>
+              </p>
+            )}
+            {!logOpen && !logSaved && (
+              <p className="mt-2 text-[13px] leading-relaxed text-[var(--c-muted)]">
+                Track the beans, the roaster, and how it tasted — saved on this
+                device, no account.
+              </p>
+            )}
+            {logOpen && (
+              <div className="mt-4 space-y-3">
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <input
+                    type="text"
+                    value={logBeans}
+                    onChange={(e) => setLogBeans(e.target.value)}
+                    placeholder="Beans (e.g. Panther Big Bang)"
+                    className="w-full rounded-xl border border-[var(--c-border)] bg-[var(--c-bg)] px-3.5 py-2.5 text-[14px] text-[var(--c-ink)] outline-none placeholder:text-[var(--c-muted)]/70 focus:border-[var(--c-accent)]"
+                  />
+                  <input
+                    type="text"
+                    value={logRoaster}
+                    onChange={(e) => setLogRoaster(e.target.value)}
+                    placeholder="Roaster / shop"
+                    className="w-full rounded-xl border border-[var(--c-border)] bg-[var(--c-bg)] px-3.5 py-2.5 text-[14px] text-[var(--c-ink)] outline-none placeholder:text-[var(--c-muted)]/70 focus:border-[var(--c-accent)]"
+                  />
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="c-label mr-1">Rating</span>
+                  {[1, 2, 3, 4, 5].map((n) => (
+                    <button
+                      key={n}
+                      onClick={() => setLogRating(n === logRating ? 0 : n)}
+                      aria-label={`${n} of 5`}
+                      className={`flex h-9 w-9 items-center justify-center rounded-full text-lg transition ${
+                        n <= logRating
+                          ? "text-[var(--c-accent-ink)]"
+                          : "text-[var(--c-border)]"
+                      }`}
+                    >
+                      ●
+                    </button>
+                  ))}
+                </div>
+                <textarea
+                  value={logNotes}
+                  onChange={(e) => setLogNotes(e.target.value)}
+                  placeholder="How did it taste? What would you change?"
+                  rows={2}
+                  className="w-full rounded-xl border border-[var(--c-border)] bg-[var(--c-bg)] px-3.5 py-2.5 text-[14px] text-[var(--c-ink)] outline-none placeholder:text-[var(--c-muted)]/70 focus:border-[var(--c-accent)]"
+                />
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      saveEntry({
+                        id: newId(),
+                        ts: Date.now(),
+                        method: method.shortName,
+                        brewer: activeBrewer
+                          ? `${activeBrewer.brand} ${activeBrewer.model}`
+                          : undefined,
+                        ratio: result.ratio,
+                        oz: result.finishedVolumeOz,
+                        beans: logBeans.trim() || undefined,
+                        roaster: logRoaster.trim() || undefined,
+                        rating: logRating || undefined,
+                        notes: logNotes.trim() || undefined,
+                      });
+                      setLogOpen(false);
+                      setLogSaved(true);
+                      setLogBeans("");
+                      setLogRoaster("");
+                      setLogRating(0);
+                      setLogNotes("");
+                    }}
+                    className="inline-flex min-h-[40px] items-center rounded-full bg-[var(--c-accent)] px-6 text-sm font-semibold text-white transition hover:opacity-90 active:scale-95"
+                  >
+                    Save to journal
+                  </button>
+                  <button
+                    onClick={() => setLogOpen(false)}
+                    className="inline-flex min-h-[40px] items-center rounded-full border border-[var(--c-border)] px-5 text-sm font-medium text-[var(--c-muted)] transition hover:border-[var(--c-accent)]/50"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* Grind + notes */}
           <div className="rounded-2xl border border-[var(--c-border)] bg-[var(--c-card)] p-6">
@@ -793,6 +1114,31 @@ function ModeChip({
     >
       {label}
     </button>
+  );
+}
+
+function FitIcon({ ok }: { ok: boolean }) {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="var(--c-accent-ink)"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      {ok ? (
+        <path d="M20 6 9 17l-5-5" />
+      ) : (
+        <>
+          <path d="M12 9v4" />
+          <path d="M12 17h.01" />
+          <path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" />
+        </>
+      )}
+    </svg>
   );
 }
 

@@ -292,3 +292,193 @@ export function formatTime(totalSec: number): string {
   const s = t % 60;
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
+
+// ─── Custom dose mode ───────────────────────────────────────────────────────
+// The user gives total coffee and total water directly; we derive the ratio
+// and everything downstream. For cold brew the water is the STEEP water, so
+// the yield is strained concentrate — dilution is left to taste.
+
+export function calculateFromDose(
+  method: BrewMethod,
+  coffeeG: number,
+  waterG: number
+): BrewResult {
+  const safeCoffee = Math.max(0.1, coffeeG);
+  const safeWater = Math.max(1, waterG);
+  const ratio = round(safeWater / safeCoffee, 1);
+  const absorbedG = safeCoffee * method.absorptionPerGram;
+  const finishedVolumeMl = Math.max(0, safeWater - absorbedG);
+
+  const bloomWaterG = method.bloom.applies
+    ? safeCoffee * method.bloom.waterMultiplier
+    : 0;
+  const brewWaterG = safeWater - bloomWaterG;
+
+  const steps = method.coldBrew
+    ? []
+    : buildPourSchedule(method, safeCoffee, safeWater, bloomWaterG);
+
+  return {
+    method,
+    style: "balanced",
+    ratio,
+    coffeeG: round(safeCoffee, 1),
+    totalWaterG: round(safeWater),
+    bloomWaterG: round(bloomWaterG),
+    brewWaterG: round(brewWaterG),
+    finishedVolumeMl: round(finishedVolumeMl),
+    finishedVolumeOz: round(finishedVolumeMl / OZ_TO_ML, 1),
+    absorbedG: round(absorbedG),
+    waterTempF: method.waterTempF,
+    waterTempC: {
+      low: fToC(method.waterTempF.low),
+      high: fToC(method.waterTempF.high),
+    },
+    steps,
+    ...(method.coldBrew
+      ? {
+          coldBrew: {
+            concentrateWaterG: round(safeWater),
+            dilutionWaterG: 0,
+            steepHoursLow: method.coldBrew.steepHoursLow,
+            steepHoursHigh: method.coldBrew.steepHoursHigh,
+          },
+        }
+      : {}),
+  };
+}
+
+// ─── Capacity fit ───────────────────────────────────────────────────────────
+// Does this recipe physically fit the chosen brewer? Immersion chambers and
+// siphon bulbs are hard caps on brew water; pour-over/Chemex are capped by
+// the server the brew drains into; cold brew vessels cap the steep water.
+
+export interface BrewerLike {
+  id: string;
+  brand: string;
+  model: string;
+  maxWaterMl: number;
+  capacityKind: "chamber" | "bulb" | "server" | "vessel";
+}
+
+export interface FitReport {
+  fits: boolean;
+  plan: "ok" | "bypass" | "reduce" | "upsize";
+  usedMl: number; // the volume this brewer must actually hold
+  capacityMl: number;
+  message: string;
+  bypass?: {
+    chamberWaterG: number; // water that brews in the chamber (concentrate)
+    bypassWaterG: number; // hot water added to the cup after pressing
+  };
+}
+
+export function assessFit(result: BrewResult, brewer: BrewerLike): FitReport {
+  const cap = brewer.maxWaterMl;
+  const name = `${brewer.brand} ${brewer.model}`;
+
+  // What the brewer must hold, by capacity kind:
+  //  chamber/bulb — all brew water sits with the grounds at once
+  //  server       — the finished brew drains into it
+  //  vessel       — the steep water (cold brew concentrate)
+  const usedMl =
+    brewer.capacityKind === "server"
+      ? result.finishedVolumeMl
+      : brewer.capacityKind === "vessel"
+      ? result.brewWaterG
+      : result.totalWaterG;
+
+  if (usedMl <= cap) {
+    return {
+      fits: true,
+      plan: "ok",
+      usedMl,
+      capacityMl: cap,
+      message: `Fits your ${name} — ${usedMl} of ${cap} ml.`,
+    };
+  }
+
+  if (brewer.capacityKind === "chamber") {
+    // AeroPress-style: brew a concentrate at full dose with as much water as
+    // the chamber holds, then top the cup with hot bypass water. Same coffee,
+    // same total water in the cup — standard championship technique.
+    const chamberWaterG = cap;
+    const bypassWaterG = round(result.totalWaterG - cap);
+    return {
+      fits: false,
+      plan: "bypass",
+      usedMl,
+      capacityMl: cap,
+      message: `${result.totalWaterG} g of water won't fit the ${name} chamber (${cap} ml). Brew a concentrate with ${chamberWaterG} g in the chamber, press, then top the cup with ${bypassWaterG} g of hot water — same strength, same cup.`,
+      bypass: { chamberWaterG, bypassWaterG },
+    };
+  }
+
+  if (brewer.capacityKind === "bulb") {
+    const maxCupMl = Math.floor(
+      (cap / result.totalWaterG) * result.finishedVolumeMl
+    );
+    return {
+      fits: false,
+      plan: "reduce",
+      usedMl,
+      capacityMl: cap,
+      message: `The ${name} lower bulb holds ${cap} ml — this brew needs ${usedMl} g of water. Brew up to ~${maxCupMl} ml (${round(maxCupMl / OZ_TO_ML, 1)} oz) in it, or step up a size.`,
+    };
+  }
+
+  // server / vessel
+  return {
+    fits: false,
+    plan: "upsize",
+    usedMl,
+    capacityMl: cap,
+    message: `This brew ${
+      brewer.capacityKind === "vessel" ? "steeps" : "yields"
+    } ${usedMl} ml — over the ${name}'s ${cap} ml. Pick a larger size or brew less.`,
+  };
+}
+
+// Pour steps for an AeroPress bypass brew: bloom, fill only to the chamber
+// cap, press, then top the cup with the bypass water.
+export function buildBypassSteps(
+  coffeeG: number,
+  chamberWaterG: number,
+  bypassWaterG: number,
+  bloomMultiplier: number,
+  bloomTimeSec: number,
+  totalSec: number
+): PourStep[] {
+  const bloomG = round(coffeeG * bloomMultiplier);
+  const pressStart = Math.max(bloomTimeSec + 60, totalSec - 45);
+  return [
+    {
+      label: "Bloom",
+      atSec: 0,
+      waterToG: bloomG,
+      addG: bloomG,
+      detail: `Wet all the grounds with ${bloomG} g and stir. Rest ${bloomTimeSec}s.`,
+    },
+    {
+      label: "Fill chamber",
+      atSec: bloomTimeSec,
+      waterToG: round(chamberWaterG),
+      addG: round(chamberWaterG - bloomG),
+      detail: `Fill to ${round(chamberWaterG)} g — the chamber's practical max. This brews a concentrate; the strength math already accounts for it.`,
+    },
+    {
+      label: "Stir, cap & press",
+      atSec: pressStart,
+      waterToG: round(chamberWaterG),
+      addG: 0,
+      detail: "Stir once, cap, and press slowly for ~20–30s. Stop at the hiss.",
+    },
+    {
+      label: "Bypass",
+      atSec: totalSec,
+      waterToG: round(chamberWaterG + bypassWaterG),
+      addG: round(bypassWaterG),
+      detail: `Top the cup with ${round(bypassWaterG)} g of hot water to reach full volume at the right strength.`,
+    },
+  ];
+}
