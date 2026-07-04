@@ -225,6 +225,47 @@ function buildPourSchedule(
 ): PourStep[] {
   const steps: PourStep[] = [];
 
+  // French press gets its own staged timeline: bloom -> fill -> break the
+  // crust & skim -> slow press. The press moment is what shapes the cup.
+  if (method.key === "frenchpress") {
+    const bloomG = method.bloom.applies ? round(bloomWaterG) : 0;
+    const t = method.totalBrewTimeSec.high; // press lands at the end
+    if (bloomG > 0) {
+      steps.push({
+        label: "Bloom & stir",
+        atSec: 0,
+        waterToG: bloomG,
+        addG: bloomG,
+        detail: `${round(method.bloom.timeSec)}s rest. ${method.bloom.technique}`,
+      });
+    }
+    steps.push({
+      label: "Fill",
+      atSec: method.bloom.timeSec,
+      waterToG: round(totalWaterG),
+      addG: round(totalWaterG - bloomG),
+      detail:
+        "Pour to the target weight, put the lid on with the plunger raised, and leave it alone — no stirring yet.",
+    });
+    steps.push({
+      label: "Break the crust & skim",
+      atSec: 240,
+      waterToG: round(totalWaterG),
+      addG: 0,
+      detail:
+        "Push the crust gently with a spoon (2–3 strokes), then skim off the floating foam and grounds. This drops the bed and stops the crust from over-steeping.",
+    });
+    steps.push({
+      label: "Press — slowly",
+      atSec: Math.max(300, t - 30),
+      waterToG: round(totalWaterG),
+      addG: 0,
+      detail:
+        "Press over ~20–30s, stopping at the liquid's surface — don't crush the bed. Pour every cup immediately so it stops extracting.",
+    });
+    return steps;
+  }
+
   if (method.isImmersion && !method.bloom.applies) {
     steps.push({
       label: "Add all water",
@@ -358,7 +399,7 @@ export interface BrewerLike {
   brand: string;
   model: string;
   maxWaterMl: number;
-  capacityKind: "chamber" | "bulb" | "server" | "vessel";
+  capacityKind: "chamber" | "bulb" | "server" | "vessel" | "carafe";
 }
 
 export interface FitReport {
@@ -414,7 +455,8 @@ export function assessFit(result: BrewResult, brewer: BrewerLike): FitReport {
     };
   }
 
-  if (brewer.capacityKind === "bulb") {
+  if (brewer.capacityKind === "bulb" || brewer.capacityKind === "carafe") {
+    const vesselWord = brewer.capacityKind === "bulb" ? "lower bulb" : "beaker";
     const maxCupMl = Math.floor(
       (cap / result.totalWaterG) * result.finishedVolumeMl
     );
@@ -423,7 +465,7 @@ export function assessFit(result: BrewResult, brewer: BrewerLike): FitReport {
       plan: "reduce",
       usedMl,
       capacityMl: cap,
-      message: `The ${name} lower bulb holds ${cap} ml — this brew needs ${usedMl} g of water. Brew up to ~${maxCupMl} ml (${round(maxCupMl / OZ_TO_ML, 1)} oz) in it, or step up a size.`,
+      message: `The ${name} ${vesselWord} holds ${cap} ml — this brew needs ${usedMl} g of water. Brew up to ~${maxCupMl} ml (${round(maxCupMl / OZ_TO_ML, 1)} oz) in it, or step up a size.`,
     };
   }
 

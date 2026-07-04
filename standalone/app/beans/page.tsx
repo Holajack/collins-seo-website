@@ -4,9 +4,9 @@ import SiteHeader from "../SiteHeader";
 import BeansClient from "./BeansClient";
 
 export const metadata: Metadata = {
-  title: "Florida Beans & Shops",
+  title: "Beans & Shops",
   description:
-    "Real Florida specialty coffee roasters and shops — bean names, tasting notes, and offers, verified from their own websites.",
+    "Real specialty coffee roasters and shops across Florida and the Southeast — bean names, tasting notes, and offers, verified from their own websites.",
 };
 
 export default function BeansPage() {
@@ -15,12 +15,12 @@ export default function BeansPage() {
       <SiteHeader active="/beans" />
       <main className="mx-auto max-w-5xl px-5 py-10 sm:px-8">
         <h1 className="c-display text-3xl font-semibold tracking-tight">
-          Florida beans &amp; shops
+          Beans &amp; shops
         </h1>
         <p className="mt-2 max-w-2xl text-[14px] leading-relaxed text-[var(--c-muted)]">
-          Specialty roasters and shops across Florida, with bean names and
-          tasting notes pulled from their own sites and verified against the
-          live pages. Menus rotate — the notes are a snapshot, the links are
+          Specialty roasters and shops across Florida and the Southeast, with
+          bean names and tasting notes pulled from their own sites and
+          verified against the live pages. Menus rotate — the notes are a snapshot, the links are
           the source of truth. Found a bean you love? Log it in your{" "}
           <a href="/journal" className="text-[var(--c-accent-ink)] underline underline-offset-2">
             journal

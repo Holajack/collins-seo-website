@@ -21,7 +21,7 @@ import {
   calculateFromDose,
 } from "./engine";
 import { brewersFor, getBrewer } from "./brewers";
-import { newId, saveEntry } from "./journal-store";
+import { newId, nudgeFor, saveEntry } from "./journal-store";
 
 type Unit = "oz" | "ml" | "cups";
 const CUP_ML = 240; // a "cup" of coffee ≈ 8 fl oz ≈ 240 ml
@@ -95,11 +95,21 @@ export default function BrewCalculator() {
   const [logRating, setLogRating] = useState(0);
   const [logNotes, setLogNotes] = useState("");
   const [copied, setCopied] = useState(false);
+  const [journalNudge, setJournalNudge] = useState<string | null>(null);
   // Only a real user interaction may write the "usual" or rewrite the URL —
   // merely opening a shared link must never overwrite the saved recipe.
   const dirtyRef = useRef(false);
 
   const method = BREW_METHODS[methodKey];
+
+  // Taste-learning nudge from the on-device journal (client-only data, so it
+  // hydrates after mount and refreshes when the method or a new log changes).
+  useEffect(() => {
+    try {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setJournalNudge(nudgeFor(BREW_METHODS[methodKey].shortName));
+    } catch {}
+  }, [methodKey, logSaved]);
 
   // Custom ratio bounds differ by method: cold brew ready-to-drink strengths
   // run much lower denominators than drip.
@@ -571,6 +581,15 @@ export default function BrewCalculator() {
 
         {/* ───────────── Recipe ───────────── */}
         <div className="space-y-5">
+          {journalNudge && (
+            <div className="flex items-start gap-2 rounded-2xl border border-[var(--c-accent)]/25 bg-[var(--c-accent)]/[0.05] px-4 py-3">
+              <span aria-hidden className="mt-0.5 text-[var(--c-accent-ink)]">→</span>
+              <p className="text-[12px] leading-relaxed text-[var(--c-muted)]">
+                <span className="font-semibold text-[var(--c-accent-ink)]">From your journal: </span>
+                {journalNudge}
+              </p>
+            </div>
+          )}
           {/* Headline numbers */}
           <div className="rounded-2xl border border-[var(--c-border)] bg-gradient-to-br from-[var(--c-accent)]/10 to-transparent p-6 sm:p-7">
             <div className="flex flex-wrap items-center justify-between gap-2">

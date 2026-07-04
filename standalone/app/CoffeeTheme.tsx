@@ -57,8 +57,27 @@ export default function CoffeeTheme() {
       }
       .c-scope .c-steam path:nth-child(2) { animation-delay: 1.5s; }
       .c-scope .c-steam path:nth-child(3) { animation-delay: 3s; }
+      @keyframes c-drip-kf {
+        0% { opacity: 0; transform: translateY(-14px); }
+        25% { opacity: 1; }
+        80% { opacity: 1; }
+        100% { opacity: 0; transform: translateY(46px); }
+      }
+      .c-scope .c-drip circle {
+        animation: c-drip-kf 2.2s cubic-bezier(0.5, 0, 0.9, 0.6) infinite;
+      }
+      .c-scope .c-drip circle:nth-child(2) { animation-delay: 0.7s; }
+      .c-scope .c-drip circle:nth-child(3) { animation-delay: 1.4s; }
+      @keyframes c-shimmer-kf {
+        0%, 100% { transform: translateX(0); opacity: 0.35; }
+        50% { transform: translateX(26px); opacity: 0.15; }
+      }
+      .c-scope .c-shimmer {
+        animation: c-shimmer-kf 5.5s ease-in-out infinite;
+      }
       @media (prefers-reduced-motion: reduce) {
-        .c-scope .c-pulse, .c-scope .c-steam path { animation: none; }
+        .c-scope .c-pulse, .c-scope .c-steam path,
+        .c-scope .c-drip circle, .c-scope .c-shimmer { animation: none; }
       }
     `}</style>
   );

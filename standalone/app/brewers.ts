@@ -7,7 +7,7 @@
 // Values reconciled against a manufacturer-spec research + critic pass.
 // ─────────────────────────────────────────────────────────────────────────
 
-export type CapacityKind = "chamber" | "bulb" | "server" | "vessel";
+export type CapacityKind = "chamber" | "bulb" | "server" | "vessel" | "carafe";
 
 export interface BrewerModel {
   id: string;
@@ -207,6 +207,49 @@ export const BREWERS: BrewerModel[] = [
     maxWaterMl: 710,
     capacityKind: "bulb",
     note: "The biggest Yama — heats directly on the range with a wire diffuser.",
+  },
+
+  // ── French press — the beaker caps total brew water (seed values; being
+  //    reconciled against a manufacturer-spec research pass)
+  {
+    id: "bodum-chambord-3",
+    methodKey: "frenchpress",
+    brand: "Bodum",
+    model: "Chambord",
+    variant: "3-cup / 12 oz",
+    maxWaterMl: 350,
+    capacityKind: "carafe",
+    note: "The one-mug classic.",
+  },
+  {
+    id: "bodum-chambord-4",
+    methodKey: "frenchpress",
+    brand: "Bodum",
+    model: "Chambord",
+    variant: "4-cup / 17 oz",
+    maxWaterMl: 500,
+    capacityKind: "carafe",
+    note: "Two smaller cups or one generous mug.",
+  },
+  {
+    id: "bodum-chambord-8",
+    methodKey: "frenchpress",
+    brand: "Bodum",
+    model: "Chambord",
+    variant: "8-cup / 34 oz",
+    maxWaterMl: 1000,
+    capacityKind: "carafe",
+    note: "The kitchen standard — comfortably serves two or three.",
+  },
+  {
+    id: "bodum-chambord-12",
+    methodKey: "frenchpress",
+    brand: "Bodum",
+    model: "Chambord",
+    variant: "12-cup / 51 oz",
+    maxWaterMl: 1500,
+    capacityKind: "carafe",
+    note: "The brunch-table beaker.",
   },
 
   // ── Cold brew vessels — cap applies to the STEEP water (the concentrate)

@@ -18,7 +18,7 @@ export interface ShopBean {
 export interface CoffeeShop {
   name: string;
   city: string;
-  region: "miami" | "orlando" | "tampa" | "jax";
+  region: "miami" | "orlando" | "tampa" | "jax" | "sc";
   website: string;
   summary: string;
   roastsOwn: boolean;
@@ -31,6 +31,7 @@ export const REGION_LABELS: Record<CoffeeShop["region"], string> = {
   orlando: "Orlando & Central Florida",
   tampa: "Tampa Bay",
   jax: "North Florida",
+  sc: "South Carolina",
 };
 
 // Filled by the verified research pass — see the workflow note above.

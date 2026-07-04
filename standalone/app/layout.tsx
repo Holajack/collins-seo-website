@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Alegreya } from "next/font/google";
 import "./globals.css";
+import RegisterSW from "./RegisterSW";
 
 // Self-hosted display serif so the editorial voice survives on Android, where
 // the Iowan/Palatino system stack falls back to a generic serif.
@@ -68,7 +69,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={displaySerif.variable}>
-      <body>{children}</body>
+      <body>
+        {children}
+        <RegisterSW />
+      </body>
     </html>
   );
 }

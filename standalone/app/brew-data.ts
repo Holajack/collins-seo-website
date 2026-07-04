@@ -14,6 +14,7 @@ export type BrewMethodKey =
   | "chemex"
   | "siphon"
   | "aeropress"
+  | "frenchpress"
   | "coldbrew";
 
 const METHODS: Record<BrewMethodKey, BrewMethod & { shortName: string }> = {
@@ -145,6 +146,40 @@ const METHODS: Record<BrewMethodKey, BrewMethod & { shortName: string }> = {
     tasteSummary:
       "Rich, smooth, and low in bitterness with a heavier body than pour over.",
     sources: ["AeroPress official", "World AeroPress Championship recipes"],
+  },
+
+  frenchpress: {
+    key: "frenchpress",
+    name: "French Press",
+    shortName: "French Press",
+    blurb:
+      "Full immersion in the classic beaker — heavy body, rich texture, zero technique anxiety.",
+    styleRatios: { strong: 12, balanced: 15, light: 17 },
+    recommendedRatio: 15,
+    absorptionPerGram: 2.0,
+    grind: "Medium-coarse — like coarse sea salt",
+    waterTempF: { low: 195, high: 205 },
+    bloom: {
+      applies: true,
+      waterMultiplier: 2,
+      timeSec: 30,
+      technique:
+        "Pour ~2× the coffee's weight, give it one gentle stir so nothing stays dry, and rest 30s — with fresh beans the crust will puff and dome.",
+    },
+    pourSchedule:
+      "Fill to weight after the bloom. At 4:00 break the crust with a spoon and skim the floating foam and grounds. Rest, then press slowly — just to the surface of the liquid, not crushing the bed — and pour immediately.",
+    totalBrewTimeSec: { low: 360, high: 480 },
+    isImmersion: true,
+    notes: [
+      "Bold and rich? Go 1:12–1:13 and press right after the crust break.",
+      "Balanced? 1:15, break at 4:00, press around 7:00–8:00 — the longer settle drops fines for a cleaner cup.",
+      "Light but flavorful? 1:16–1:17, same schedule, slightly finer grind to keep flavor up.",
+      "Press slowly for ~20–30s and stop at the liquid's surface — plunging hard stirs up silt.",
+      "Pour every cup right away; coffee sitting on the bed keeps extracting and turns bitter.",
+    ],
+    tasteSummary:
+      "Heavy-bodied, rich, and textured — the fullest expression of the bean.",
+    sources: ["James Hoffmann French press technique", "Specialty press guides"],
   },
 
   coldbrew: {

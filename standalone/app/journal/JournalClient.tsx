@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
+  analyzeJournal,
   deleteEntry,
   loadJournal,
   type JournalEntry,
@@ -43,8 +44,31 @@ export default function JournalClient() {
     );
   }
 
+  const insights = analyzeJournal(entries);
+
   return (
-    <ul className="mt-8 space-y-3">
+    <>
+      {insights.length > 0 && (
+        <section className="mt-8 rounded-2xl border border-[var(--c-accent)]/30 bg-[var(--c-accent)]/[0.06] p-5">
+          <h2 className="c-display text-lg font-bold text-[var(--c-ink)]">
+            What your cups are telling you
+          </h2>
+          <ul className="mt-3 space-y-2">
+            {insights.map((i, idx) => (
+              <li
+                key={idx}
+                className="flex gap-2 text-[13px] leading-relaxed text-[var(--c-muted)]"
+              >
+                <span aria-hidden className="mt-0.5 shrink-0 text-[var(--c-accent-ink)]">
+                  {i.kind === "dialed" ? "◎" : i.kind === "beans" ? "❖" : "→"}
+                </span>
+                {i.text}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+      <ul className="mt-6 space-y-3">
       {entries.map((e) => (
         <li
           key={e.id}
@@ -96,6 +120,7 @@ export default function JournalClient() {
           </button>
         </li>
       ))}
-    </ul>
+      </ul>
+    </>
   );
 }

@@ -7,7 +7,7 @@ import {
   type CoffeeShop,
 } from "../florida-coffee";
 
-const REGIONS = ["all", "miami", "orlando", "tampa", "jax"] as const;
+const REGIONS = ["all", "miami", "orlando", "tampa", "jax", "sc"] as const;
 type RegionFilter = (typeof REGIONS)[number];
 
 export default function BeansClient() {
@@ -63,7 +63,7 @@ export default function BeansClient() {
                   : "border-[var(--c-border)] text-[var(--c-muted)] hover:border-[var(--c-accent)]/50"
               }`}
             >
-              {r === "all" ? "All Florida" : REGION_LABELS[r]}
+              {r === "all" ? "Everywhere" : REGION_LABELS[r]}
             </button>
           ))}
         </div>
