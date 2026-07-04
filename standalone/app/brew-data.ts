@@ -32,13 +32,13 @@ const METHODS: Record<BrewMethodKey, BrewMethod & { shortName: string }> = {
     bloom: {
       applies: true,
       waterMultiplier: 2.5,
-      timeSec: 40,
+      timeSec: 45,
       technique:
-        "Pour about 2–3× the coffee's weight in water to fully saturate the bed, swirl the dripper gently for even wetting, then rest ~30–45s to degas (longer for fresher, lighter roasts). Fresh coffee will dome and bubble.",
+        "Pour about 2–3× the coffee's weight in water to fully saturate the bed, swirl the dripper gently for even wetting, then rest until 0:45 to degas (longer for fresher, lighter roasts). Fresh coffee will dome and bubble.",
     },
     pourSchedule:
-      "After the bloom, pour in 2–3 slow concentric pulses, letting the bed draw down between each.",
-    totalBrewTimeSec: { low: 180, high: 240 },
+      "Hoffmann two-pour: bloom + swirl, to 60% of the water by 1:15, to 100% by 1:45, stir, final swirl, drawdown done ~3:00–3:30. Small cups switch to four equal pulses.",
+    totalBrewTimeSec: { low: 180, high: 225 },
     isImmersion: false,
     notes: [
       "Aim for ~205–208°F for light roasts, ~200–205°F medium, ~195–200°F dark. Avoid a full rolling boil.",
@@ -65,13 +65,13 @@ const METHODS: Record<BrewMethodKey, BrewMethod & { shortName: string }> = {
     bloom: {
       applies: true,
       waterMultiplier: 2.5,
-      timeSec: 40,
+      timeSec: 45,
       technique:
-        "Pour bloom water (about 2–3× the coffee weight) in a slow spiral from the center out until every ground is wet. Gently swirl the Chemex to soak any dry pockets, then rest ~30–45s to let CO₂ escape. The thick filter is slow, so an even bloom matters even more here.",
+        "Pour bloom water (about 2–3× the coffee weight) in a slow spiral from the center out until every ground is wet. Gently swirl the Chemex to soak any dry pockets, then rest until 0:45 to let CO₂ escape. The thick filter is slow, so an even bloom matters even more here.",
     },
     pourSchedule:
-      "Pour in 2–3 stages in slow circles. The thick filter is forgiving on flow but unforgiving on a clogged bed — go coarser if it stalls.",
-    totalBrewTimeSec: { low: 210, high: 300 },
+      "Bloom, then staged spiral pours every ~45s (two on a 3-cup, three on the classic, four on big batches), stir & swirl, and a drawdown about as long as the pouring phase.",
+    totalBrewTimeSec: { low: 210, high: 330 },
     isImmersion: false,
     notes: [
       "Brew runs slow? Go coarser — a stalled Chemex over-extracts and turns bitter.",
@@ -101,8 +101,8 @@ const METHODS: Record<BrewMethodKey, BrewMethod & { shortName: string }> = {
       technique: "",
     },
     pourSchedule:
-      "All water goes in the lower bulb first. Heat until it rises to the top chamber, then add the grounds and stir 3–5 circles to saturate (this is the bloom-equivalent). Hold at a gentle flame ~91–93°C for 60–90s, give a final stir, then cut the heat — the vacuum draws the brew down in ~30–60s.",
-    totalBrewTimeSec: { low: 120, high: 210 },
+      "All water goes in the lower bulb first. Heat until it rises to the top chamber — the timer starts there. Add the grounds and stir 3–5 circles to saturate, hold a low flame, break the crust mid-steep, then final stir + heat off at ~1:00–1:35 by batch size — the vacuum draws the brew down in ~30–60s.",
+    totalBrewTimeSec: { low: 105, high: 165 },
     isImmersion: true,
     notes: [
       "There's no CO₂ bloom here — the gentle stir on immersion is what evenly saturates the bed.",
@@ -134,8 +134,8 @@ const METHODS: Record<BrewMethodKey, BrewMethod & { shortName: string }> = {
         "This isn't a true pour-over bloom — AeroPress is full immersion, so there's no draining bed to degas. But for fresh coffee it still helps: add ~2× the coffee weight, stir to wet everything, and rest 30s to release CO₂ before topping up. Skip the rest for darker roasts.",
     },
     pourSchedule:
-      "After the bloom, fill to your target weight, stir once, cap, steep ~1:00, then press slowly and steadily for ~20–30s. Stop at the hiss.",
-    totalBrewTimeSec: { low: 120, high: 210 },
+      "Add coffee, bloom 30s, fill by 0:55, brief stir, cap with a slight pull-up, steep hands-off to 2:00, then press gently for 25–30s. Stop at the hiss. Done by 2:30.",
+    totalBrewTimeSec: { low: 90, high: 150 },
     isImmersion: true,
     notes: [
       "Default ~200–205°F for medium/dark roasts; drop toward 185–195°F for light roasts.",

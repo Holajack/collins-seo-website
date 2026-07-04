@@ -10,6 +10,7 @@ import {
   formatTime,
   ozToMl,
   round,
+  OZ_TO_ML,
   type BrewResult,
   type StyleKey,
   type TargetMode,
@@ -24,9 +25,22 @@ import {
 import { brewersFor, getBrewer } from "./brewers";
 import { newId, nudgeFor, saveEntry } from "./journal-store";
 
-type Unit = "oz" | "ml" | "cups";
-const CUP_ML = 240; // a "cup" of coffee ≈ 8 fl oz ≈ 240 ml
+type Unit = "oz" | "ml" | "cups"; // legacy links may carry ml/cups; the dial is oz
 const USUAL_KEY = "pb:usual";
+
+// The cup dial: fixed stops only — no typing, no odd sizes. The math for
+// every stop is pre-solved against the chosen brewer, so a size that
+// physically can't fit is disabled (or, on an AeroPress, flips the plan to
+// concentrate + bypass instead).
+const DIAL_SIZES_OZ = [2, 4, 6, 8, 10, 12, 16, 24] as const;
+
+function snapToDial(oz: number): number {
+  let best: number = DIAL_SIZES_OZ[0];
+  for (const s of DIAL_SIZES_OZ) {
+    if (Math.abs(s - oz) < Math.abs(best - oz)) best = s;
+  }
+  return best;
+}
 
 const STYLES: { key: StyleKey; label: string; hint: string }[] = [
   { key: "strong", label: "Strong & bold", hint: "Lower ratio, more coffee" },
@@ -47,8 +61,6 @@ interface BrewState {
   b?: string; // brewer id
 }
 
-const UNITS: Unit[] = ["oz", "ml", "cups"];
-
 function parseState(params: URLSearchParams): Partial<BrewState> | null {
   const out: Partial<BrewState> = {};
   const m = params.get("m");
@@ -56,11 +68,16 @@ function parseState(params: URLSearchParams): Partial<BrewState> | null {
   const s = params.get("s");
   if (s && STYLES.some((x) => x.key === s)) out.s = s as StyleKey;
   const a = Number(params.get("a"));
-  // Clamp rather than drop, so a shared 1.5 L cold-brew batch never silently
-  // reverts to the 12-unit default (20000 covers 20 L in ml).
-  if (Number.isFinite(a) && a > 0) out.a = Math.min(a, 20000);
   const u = params.get("u");
-  if (u && UNITS.includes(u as Unit)) out.u = u as Unit;
+  if (Number.isFinite(a) && a > 0) {
+    // Links from the pre-dial era could carry any amount in oz/ml/cups —
+    // normalize to ounces, then snap to the nearest dial stop so the shared
+    // recipe lands on a size the dial can actually show.
+    const oz =
+      u === "ml" ? a / OZ_TO_ML : u === "cups" ? a * 8 : a;
+    out.a = snapToDial(oz);
+    out.u = "oz";
+  }
   const mode = params.get("mode");
   if (mode === "cup" || mode === "water") out.mode = mode;
   const r = Number(params.get("r"));
@@ -79,8 +96,7 @@ function parseState(params: URLSearchParams): Partial<BrewState> | null {
 export default function BrewCalculator() {
   const [methodKey, setMethodKey] = useState<BrewMethodKey>("pourover_v60");
   const [style, setStyle] = useState<StyleKey>("balanced");
-  const [amount, setAmount] = useState<number>(12);
-  const [unit, setUnit] = useState<Unit>("oz");
+  const [amount, setAmount] = useState<number>(12); // always a dial stop, in oz
   const [targetMode, setTargetMode] = useState<TargetMode>("cup");
   const [useCustomRatio, setUseCustomRatio] = useState(false);
   const [customRatio, setCustomRatio] = useState<number>(16);
@@ -118,12 +134,55 @@ export default function BrewCalculator() {
     ? { min: 6, max: 12, minLabel: "1:6 (bold)", maxLabel: "1:12 (delicate)" }
     : { min: 12, max: 20, minLabel: "1:12 (intense)", maxLabel: "1:20 (delicate)" };
 
+  // Brewer + dial derivation. Every dial stop is pre-solved against the
+  // active brewer: "ok" fits outright; "bypass" stays selectable on chamber
+  // brewers (AeroPress brews a concentrate, then tops up with hot water);
+  // anything else is physically too big and gets disabled. The shown size is
+  // DERIVED, never clamped in state — pick a smaller brewer and the dial
+  // instantly lands on the biggest stop that still works.
+  const brewer = brewerId ? getBrewer(brewerId) : undefined;
+  const activeBrewer =
+    brewer && brewer.methodKey === methodKey ? brewer : undefined;
+
+  const dialFits = useMemo(
+    () =>
+      DIAL_SIZES_OZ.map((oz) => {
+        if (!activeBrewer) return { oz, plan: "ok" as const };
+        const r = calculateBrew(
+          method,
+          style,
+          ozToMl(oz),
+          targetMode,
+          useCustomRatio ? customRatio : undefined
+        );
+        return { oz, plan: assessFit(r, activeBrewer).plan };
+      }),
+    [method, style, targetMode, useCustomRatio, customRatio, activeBrewer]
+  );
+
+  const selectableStops = dialFits.filter(
+    (d) => d.plan === "ok" || d.plan === "bypass"
+  );
+  const snapped = snapToDial(amount);
+  const effectiveAmount =
+    selectableStops.some((d) => d.oz === snapped) || selectableStops.length === 0
+      ? snapped
+      : selectableStops.filter((d) => d.oz < snapped).map((d) => d.oz).pop() ??
+        selectableStops[0].oz;
+  const maxSelectableOz =
+    selectableStops.length > 0
+      ? selectableStops[selectableStops.length - 1].oz
+      : null;
+  const hasDisabledStops = dialFits.some(
+    (d) => d.plan !== "ok" && d.plan !== "bypass"
+  );
+  const hasBypassStops = dialFits.some((d) => d.plan === "bypass");
+
   const applyState = (s: Partial<BrewState>) => {
     const targetMethod = s.m ?? methodKey;
     if (s.m) setMethodKey(s.m);
     if (s.s) setStyle(s.s);
-    if (s.a != null) setAmount(s.a);
-    if (s.u) setUnit(s.u);
+    if (s.a != null) setAmount(snapToDial(s.a));
     if (s.mode) setTargetMode(s.mode);
     if (s.r != null) {
       // Clamp into the method's sensible range — cold brew below 1:6 would
@@ -186,8 +245,8 @@ export default function BrewCalculator() {
       params.set("w", String(doseWaterG));
     } else {
       params.set("s", style);
-      params.set("a", String(amount));
-      params.set("u", unit);
+      // Serialize the size the recipe actually shows (post-clamp), always oz.
+      params.set("a", String(effectiveAmount));
       if (!BREW_METHODS[methodKey].coldBrew) params.set("mode", targetMode);
       if (useCustomRatio) params.set("r", String(customRatio));
     }
@@ -202,8 +261,8 @@ export default function BrewCalculator() {
     const state: BrewState = {
       m: methodKey,
       s: style,
-      a: amount,
-      u: unit,
+      a: effectiveAmount,
+      u: "oz",
       mode: targetMode,
       ...(useCustomRatio ? { r: customRatio } : {}),
       ...(inputMode === "dose"
@@ -223,17 +282,13 @@ export default function BrewCalculator() {
       );
     } catch {}
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [methodKey, style, amount, unit, targetMode, useCustomRatio, customRatio, inputMode, doseCoffeeG, doseWaterG, brewerId]);
+  }, [methodKey, style, effectiveAmount, targetMode, useCustomRatio, customRatio, inputMode, doseCoffeeG, doseWaterG, brewerId]);
 
   const markDirty = () => {
     dirtyRef.current = true;
   };
 
-  const targetMl = useMemo(() => {
-    if (unit === "oz") return ozToMl(amount);
-    if (unit === "cups") return amount * CUP_ML;
-    return amount;
-  }, [amount, unit]);
+  const targetMl = useMemo(() => ozToMl(effectiveAmount), [effectiveAmount]);
 
   const result = useMemo(
     () =>
@@ -251,26 +306,24 @@ export default function BrewCalculator() {
 
   // Capacity fit against the chosen brewer (if any), and the steps the timer
   // should walk — an over-capacity AeroPress switches to concentrate+bypass.
-  const brewer = brewerId ? getBrewer(brewerId) : undefined;
-  const activeBrewer = brewer && brewer.methodKey === methodKey ? brewer : undefined;
   const fit = activeBrewer ? assessFit(result, activeBrewer) : null;
-  // French press total time is style-dependent (bold ~4:40, light ~6:25,
-  // balanced ~9:20); every other method uses its fixed target.
-  const timerTotalSec =
-    methodKey === "frenchpress"
-      ? frenchPressPlan(inputMode === "dose" ? "balanced" : style).totalSec
-      : method.totalBrewTimeSec.high;
   const timerSteps =
     fit?.plan === "bypass" && fit.bypass
       ? buildBypassSteps(
           result.coffeeG,
           fit.bypass.chamberWaterG,
-          fit.bypass.bypassWaterG,
-          method.bloom.waterMultiplier || 2,
-          method.bloom.timeSec || 30,
-          method.totalBrewTimeSec.high
+          fit.bypass.bypassWaterG
         )
       : result.steps;
+  // French press total time is style-dependent (bold ~4:40, light ~6:25,
+  // balanced ~9:20). Every other schedule ends with an explicit "Done" step,
+  // so the last step's time IS the brew's target total.
+  const timerTotalSec =
+    methodKey === "frenchpress"
+      ? frenchPressPlan(inputMode === "dose" ? "balanced" : style).totalSec
+      : timerSteps.length > 0
+      ? timerSteps[timerSteps.length - 1].atSec
+      : method.totalBrewTimeSec.high;
 
   const ratioLabel = `1:${result.ratio}`;
 
@@ -442,36 +495,80 @@ export default function BrewCalculator() {
                 ? "in the cup"
                 : "of total water"}?
             </label>
-            <div className="mt-3 flex gap-2">
-              <input
-                type="number"
-                min={1}
-                value={amount}
-                onChange={(e) => {
-                  markDirty();
-                  setAmount(Math.max(0, Number(e.target.value)));
-                }}
-                className="w-full rounded-xl border border-[var(--c-border)] bg-[var(--c-bg)] px-4 py-3 text-lg font-semibold text-[var(--c-ink)] outline-none focus:border-[var(--c-accent)]"
-              />
-              <div className="flex overflow-hidden rounded-xl border border-[var(--c-border)]">
-                {UNITS.map((u) => (
+            {/* The cup dial — fixed stops only, pre-solved against the brewer */}
+            <div
+              role="radiogroup"
+              aria-label="Cup size in ounces"
+              className="mt-3 grid grid-cols-4 gap-2 sm:grid-cols-8"
+            >
+              {dialFits.map(({ oz, plan }) => {
+                const selectable = plan === "ok" || plan === "bypass";
+                const selected = effectiveAmount === oz;
+                return (
                   <button
-                    key={u}
+                    key={oz}
+                    role="radio"
+                    aria-checked={selected}
+                    disabled={!selectable}
                     onClick={() => {
                       markDirty();
-                      setUnit(u);
+                      setAmount(oz);
                     }}
-                    className={`px-3 text-sm font-medium transition ${
-                      unit === u
-                        ? "bg-[var(--c-accent)] text-white"
-                        : "bg-transparent text-[var(--c-muted)] hover:bg-[var(--c-accent)]/10"
+                    className={`relative rounded-xl border px-1 py-2.5 text-center transition ${
+                      selected
+                        ? "border-[var(--c-accent)] bg-[var(--c-accent)]/10"
+                        : selectable
+                        ? "border-[var(--c-border)] hover:border-[var(--c-accent)]/50"
+                        : "cursor-not-allowed border-[var(--c-border)]/60 opacity-35"
                     }`}
                   >
-                    {u}
+                    <span
+                      className={`block font-mono text-lg font-bold tabular-nums leading-none ${
+                        selected
+                          ? "text-[var(--c-accent-ink)]"
+                          : "text-[var(--c-ink)]"
+                      }`}
+                    >
+                      {oz}
+                      {plan === "bypass" && (
+                        <span
+                          aria-hidden
+                          className="align-super text-[11px] font-semibold text-[var(--c-accent-ink)]"
+                        >
+                          *
+                        </span>
+                      )}
+                    </span>
+                    <span className="mt-0.5 block text-[10px] uppercase tracking-wide text-[var(--c-muted)]">
+                      oz
+                    </span>
                   </button>
-                ))}
-              </div>
+                );
+              })}
             </div>
+            <p className="mt-2 text-[12px] leading-relaxed text-[var(--c-muted)]">
+              <span className="font-mono font-semibold text-[var(--c-accent-ink)]">
+                {effectiveAmount} oz
+              </span>{" "}
+              ≈ {round(ozToMl(effectiveAmount))} ml.
+              {activeBrewer && hasDisabledStops && maxSelectableOz != null && (
+                <>
+                  {" "}
+                  Your {activeBrewer.brand} {activeBrewer.model} tops out at{" "}
+                  {maxSelectableOz} oz on this dial.
+                </>
+              )}
+              {hasBypassStops && (
+                <>
+                  {" "}
+                  <span className="font-semibold text-[var(--c-accent-ink)]">
+                    *
+                  </span>{" "}
+                  Over the chamber — brews a concentrate, then tops up with hot
+                  water at the end. Same strength, same cup.
+                </>
+              )}
+            </p>
             <div className="mt-3 flex flex-wrap gap-2">
               {method.coldBrew ? (
                 <span className="text-[12px] text-[var(--c-muted)]">
