@@ -20,8 +20,9 @@ export default function JournalPage() {
         </h1>
         <p className="mt-2 text-[14px] leading-relaxed text-[var(--c-muted)]">
           Every brew you log lives on this device only — no account, nothing
-          uploaded. Log one from the calculator after the timer finishes (or
-          any time from the recipe card).
+          uploaded — and you can take it with you: back it up to a file, share
+          it to Drive, restore it on a new phone. Log one from the calculator
+          after the timer finishes (or any time from the recipe card).
         </p>
         <JournalClient />
       </main>

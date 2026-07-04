@@ -436,7 +436,7 @@ export default function BrewCalculator() {
                   markDirty();
                   setInputMode("dose");
                 }}
-                label="Custom dose (g)"
+                label="Exact grams (dose)"
               />
             </div>
           </div>
@@ -845,27 +845,32 @@ export default function BrewCalculator() {
               </p>
             </div>
           )}
+        </div>
+      </div>
 
-          {/* Pour schedule + interactive timer */}
-          {timerSteps.length > 0 && (
-            <div className="rounded-2xl border border-[var(--c-border)] bg-[var(--c-card)] p-6">
-              <div className="mb-5 flex items-center justify-between">
-                <h3 className="c-display text-base font-bold text-[var(--c-ink)]">
-                  {method.isImmersion ? "Steps & timer" : "Pour schedule & timer"}
-                </h3>
-                <span className="text-[12px] text-[var(--c-muted)]">
-                  target total ~{formatTime(timerTotalSec)}
-                </span>
-              </div>
-              <BrewTimer
-                key={`${methodKey}-${result.ratio}-${result.totalWaterG}-${fit?.plan ?? "none"}-${timerTotalSec}`}
-                steps={timerSteps}
-                totalSec={timerTotalSec}
-                isImmersion={method.isImmersion}
-              />
-            </div>
-          )}
+      {/* ───────────── Steps & timer — full width so the schedule breathes on
+           desktop instead of stacking a mile-long right column ───────────── */}
+      {timerSteps.length > 0 && (
+        <div className="rounded-2xl border border-[var(--c-border)] bg-[var(--c-card)] p-6">
+          <div className="mb-5 flex items-center justify-between">
+            <h3 className="c-display text-base font-bold text-[var(--c-ink)]">
+              {method.isImmersion ? "Steps & timer" : "Pour schedule & timer"}
+            </h3>
+            <span className="text-[12px] text-[var(--c-muted)]">
+              target total ~{formatTime(timerTotalSec)}
+            </span>
+          </div>
+          <BrewTimer
+            key={`${methodKey}-${result.ratio}-${result.totalWaterG}-${fit?.plan ?? "none"}-${timerTotalSec}`}
+            steps={timerSteps}
+            totalSec={timerTotalSec}
+            isImmersion={method.isImmersion}
+          />
+        </div>
+      )}
 
+      {/* Log + grind share a row on desktop */}
+      <div className="grid gap-6 lg:grid-cols-2">
           {/* Log this brew */}
           <div className="rounded-2xl border border-[var(--c-border)] bg-[var(--c-card)] p-6">
             <div className="flex flex-wrap items-center justify-between gap-2">
@@ -998,31 +1003,25 @@ export default function BrewCalculator() {
             )}
           </div>
 
-          {/* Grind + notes */}
+          {/* Grind + notes — stacked so the tips never get crushed into a
+              sliver next to a long grind description */}
           <div className="rounded-2xl border border-[var(--c-border)] bg-[var(--c-card)] p-6">
-            <div className="grid gap-4 sm:grid-cols-[auto_1fr] sm:gap-6">
-              <div>
-                <div className="c-label">Grind</div>
-                <div className="mt-1 text-sm font-semibold text-[var(--c-ink)]">
-                  {method.grind}
-                </div>
-              </div>
-              <div>
-                <div className="c-label">Dial it in</div>
-                <ul className="mt-1 space-y-1">
-                  {method.notes.map((n, i) => (
-                    <li
-                      key={i}
-                      className="text-[13px] leading-relaxed text-[var(--c-muted)]"
-                    >
-                      • {n}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+            <div className="c-label">Grind</div>
+            <div className="mt-1 text-sm font-semibold text-[var(--c-ink)]">
+              {method.grind}
             </div>
+            <div className="c-label mt-4">Dial it in</div>
+            <ul className="mt-1 space-y-1.5">
+              {method.notes.map((n, i) => (
+                <li
+                  key={i}
+                  className="text-[13px] leading-relaxed text-[var(--c-muted)]"
+                >
+                  • {n}
+                </li>
+              ))}
+            </ul>
           </div>
-        </div>
       </div>
 
       {/* ───────────── The Water Ledger ───────────── */}

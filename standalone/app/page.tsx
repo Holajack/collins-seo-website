@@ -33,7 +33,7 @@ const FAQS: { q: string; a: string }[] = [
   },
   {
     q: "Can I save or share a recipe?",
-    a: "Every recipe lives in the page's address — hit 'Copy recipe link' and send it to anyone; the calculator opens exactly as you set it. The page also quietly remembers your last recipe on this device, so tomorrow morning your usual is one tap away. No account, ever.",
+    a: "Every recipe lives in the page's address — hit 'Copy recipe link' and send it to anyone; the calculator opens exactly as you set it. The page also quietly remembers your last recipe on this device, so tomorrow morning your usual is one tap away. No account needed — and your journal backs up to a plain file you own, from the Journal page.",
   },
 ];
 

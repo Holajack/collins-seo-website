@@ -363,15 +363,16 @@ export default function BrewTimer({
         </div>
       </div>
 
-      {/* Step list with live highlighting */}
-      <ol className="mt-6 space-y-2.5">
+      {/* Step list with live highlighting — flows into two columns when the
+          card is full-width on desktop (top-to-bottom, then the next column) */}
+      <ol className="mt-6 space-y-2.5 lg:columns-2 lg:gap-x-10 lg:space-y-0">
         {steps.map((step, i) => {
           const done = i < activeIdx;
           const active = i === activeIdx;
           return (
             <li
               key={i}
-              className={`flex gap-3 rounded-xl px-3 py-2 transition ${
+              className={`flex gap-3 rounded-xl px-3 py-2 transition lg:mb-2.5 lg:break-inside-avoid ${
                 active
                   ? "bg-[var(--c-accent)]/10 ring-1 ring-[var(--c-accent)]/30"
                   : ""

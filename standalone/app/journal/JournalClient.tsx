@@ -1,12 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
   aggregateBeans,
   analyzeJournal,
+  backupNudge,
+  buildBackup,
   deleteEntry,
+  importBackup,
   loadJournal,
+  markBackedUp,
   type BeanProfile,
   type JournalEntry,
 } from "../journal-store";
@@ -24,9 +28,21 @@ function RatingDots({ value }: { value: number }) {
   );
 }
 
+function backupFileName(): string {
+  const d = new Date();
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `perfect-brew-journal-${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(
+    d.getDate()
+  )}.json`;
+}
+
 export default function JournalClient() {
   const [entries, setEntries] = useState<JournalEntry[] | null>(null);
   const [view, setView] = useState<"beans" | "brews" | null>(null);
+  const [nudge, setNudge] = useState<string | null>(null);
+  const [canShareFile, setCanShareFile] = useState(false);
+  const [restoreMsg, setRestoreMsg] = useState<string | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   // localStorage exists only client-side; SSR renders the loading state.
   /* eslint-disable react-hooks/set-state-in-effect */
@@ -36,8 +52,65 @@ export default function JournalClient() {
     // Land on the bean view when there are beans to show — that's the point
     // of the journal — otherwise the plain brew log.
     setView(aggregateBeans(loaded).length > 0 ? "beans" : "brews");
+    setNudge(backupNudge(loaded));
+    try {
+      const probe = new File(["x"], "probe.json", { type: "application/json" });
+      setCanShareFile(!!navigator.canShare?.({ files: [probe] }));
+    } catch {}
   }, []);
   /* eslint-enable react-hooks/set-state-in-effect */
+
+  const downloadBackup = () => {
+    try {
+      const blob = new Blob([JSON.stringify(buildBackup(), null, 2)], {
+        type: "application/json",
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = backupFileName();
+      a.click();
+      URL.revokeObjectURL(url);
+      markBackedUp();
+      setNudge(null);
+      setRestoreMsg("Backup saved — keep the file somewhere safe (Drive, email, anywhere).");
+    } catch {}
+  };
+
+  const shareBackup = async () => {
+    try {
+      const file = new File([JSON.stringify(buildBackup(), null, 2)], backupFileName(), {
+        type: "application/json",
+      });
+      await navigator.share({ files: [file], title: "Perfect Brew journal backup" });
+      markBackedUp();
+      setNudge(null);
+    } catch {
+      // user cancelled the share sheet — nothing to do
+    }
+  };
+
+  const restoreFromFile = async (file: File) => {
+    try {
+      const parsed: unknown = JSON.parse(await file.text());
+      const res = importBackup(parsed);
+      if (!res) {
+        setRestoreMsg("That file doesn't look like a Perfect Brew journal backup.");
+        return;
+      }
+      const reloaded = loadJournal();
+      setEntries(reloaded);
+      setView(aggregateBeans(reloaded).length > 0 ? "beans" : "brews");
+      setNudge(backupNudge(reloaded));
+      setRestoreMsg(
+        res.added > 0
+          ? `Restored — ${res.added} brew${res.added === 1 ? "" : "s"} added (${res.total} total).`
+          : "Nothing new in that backup — every brew in it is already here."
+      );
+    } catch {
+      setRestoreMsg("Couldn't read that file — it isn't valid backup JSON.");
+    }
+  };
 
   if (entries === null || view === null) {
     return (
@@ -55,12 +128,34 @@ export default function JournalClient() {
           Dial in a recipe, brew it, then hit “Log this brew” on the recipe
           card — your beans, rating, and notes will show up here.
         </p>
-        <Link
-          href="/"
-          className="mt-5 inline-flex min-h-[40px] items-center rounded-full bg-[var(--c-accent)] px-6 py-2 text-sm font-semibold text-white transition hover:opacity-90"
-        >
-          Brew something
-        </Link>
+        <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+          <Link
+            href="/"
+            className="inline-flex min-h-[40px] items-center rounded-full bg-[var(--c-accent)] px-6 py-2 text-sm font-semibold text-white transition hover:opacity-90"
+          >
+            Brew something
+          </Link>
+          <button
+            onClick={() => fileRef.current?.click()}
+            className="inline-flex min-h-[40px] items-center rounded-full border border-[var(--c-border)] px-5 text-[13px] font-medium text-[var(--c-muted)] transition hover:border-[var(--c-accent)]/50"
+          >
+            New phone? Restore a backup
+          </button>
+        </div>
+        {restoreMsg && (
+          <p className="mt-3 text-[12px] text-[var(--c-muted)]">{restoreMsg}</p>
+        )}
+        <input
+          ref={fileRef}
+          type="file"
+          accept="application/json,.json"
+          className="hidden"
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (f) restoreFromFile(f);
+            e.target.value = "";
+          }}
+        />
       </div>
     );
   }
@@ -70,6 +165,50 @@ export default function JournalClient() {
 
   return (
     <>
+      {/* Durability toolbar — the journal is a file you own */}
+      <div className="mt-6 flex flex-wrap items-center gap-2">
+        <button
+          onClick={downloadBackup}
+          className="inline-flex min-h-[40px] items-center rounded-full border border-[var(--c-accent)]/40 px-4 text-[12px] font-semibold text-[var(--c-accent-ink)] transition hover:bg-[var(--c-accent)]/10"
+        >
+          Back up journal
+        </button>
+        {canShareFile && (
+          <button
+            onClick={shareBackup}
+            className="inline-flex min-h-[40px] items-center rounded-full border border-[var(--c-accent)]/40 px-4 text-[12px] font-semibold text-[var(--c-accent-ink)] transition hover:bg-[var(--c-accent)]/10"
+          >
+            Share backup
+          </button>
+        )}
+        <button
+          onClick={() => fileRef.current?.click()}
+          className="inline-flex min-h-[40px] items-center rounded-full border border-[var(--c-border)] px-4 text-[12px] font-medium text-[var(--c-muted)] transition hover:border-[var(--c-accent)]/50"
+        >
+          Restore
+        </button>
+        <input
+          ref={fileRef}
+          type="file"
+          accept="application/json,.json"
+          className="hidden"
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (f) restoreFromFile(f);
+            e.target.value = "";
+          }}
+        />
+      </div>
+      {restoreMsg && (
+        <p className="mt-2 text-[12px] text-[var(--c-muted)]">{restoreMsg}</p>
+      )}
+      {nudge && (
+        <div className="mt-3 flex items-start gap-2 rounded-2xl border border-[var(--c-accent)]/25 bg-[var(--c-accent)]/[0.05] px-4 py-3">
+          <span aria-hidden className="mt-0.5 text-[var(--c-accent-ink)]">↓</span>
+          <p className="text-[12px] leading-relaxed text-[var(--c-muted)]">{nudge}</p>
+        </div>
+      )}
+
       {insights.length > 0 && (
         <section className="mt-8 rounded-2xl border border-[var(--c-accent)]/30 bg-[var(--c-accent)]/[0.06] p-5">
           <h2 className="c-display text-lg font-bold text-[var(--c-ink)]">

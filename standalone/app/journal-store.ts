@@ -20,16 +20,22 @@ export interface JournalEntry {
 
 const KEY = "pb:journal";
 
+function isEntry(e: unknown): e is JournalEntry {
+  return (
+    !!e &&
+    typeof e === "object" &&
+    typeof (e as JournalEntry).id === "string" &&
+    typeof (e as JournalEntry).ts === "number"
+  );
+}
+
 export function loadJournal(): JournalEntry[] {
   try {
     const raw = window.localStorage.getItem(KEY);
     if (!raw) return [];
     const arr = JSON.parse(raw);
     if (!Array.isArray(arr)) return [];
-    return arr.filter(
-      (e): e is JournalEntry =>
-        e && typeof e === "object" && typeof e.id === "string" && typeof e.ts === "number"
-    );
+    return arr.filter(isEntry);
   } catch {
     return [];
   }
@@ -49,6 +55,79 @@ export function deleteEntry(id: string): JournalEntry[] {
     window.localStorage.setItem(KEY, JSON.stringify(all));
   } catch {}
   return all;
+}
+
+// ─── Durability: backup & restore ───────────────────────────────────────────
+// The journal's one copy lives in localStorage, so a phone change or a cleared
+// browser is total loss. Backups are a plain JSON file the user owns — no
+// account, no server, consistent with the product's promise.
+
+export interface JournalBackup {
+  app: "the-perfect-brew";
+  kind: "journal-backup";
+  version: 1;
+  exportedAt: number;
+  entries: JournalEntry[];
+}
+
+const BACKUP_META_KEY = "pb:backupMeta";
+
+export function buildBackup(): JournalBackup {
+  return {
+    app: "the-perfect-brew",
+    kind: "journal-backup",
+    version: 1,
+    exportedAt: Date.now(),
+    entries: loadJournal(),
+  };
+}
+
+export function markBackedUp(): void {
+  try {
+    window.localStorage.setItem(
+      BACKUP_META_KEY,
+      JSON.stringify({ ts: Date.now(), count: loadJournal().length })
+    );
+  } catch {}
+}
+
+/** Union-merge a backup file into the journal, keyed by entry id — existing
+ *  entries win, restored ones fill the gaps. Returns null for a file that
+ *  isn't a Perfect Brew backup. */
+export function importBackup(raw: unknown): { added: number; total: number } | null {
+  if (!raw || typeof raw !== "object") return null;
+  const b = raw as Partial<JournalBackup>;
+  if (b.kind !== "journal-backup" || !Array.isArray(b.entries)) return null;
+  const incoming = b.entries.filter(isEntry);
+  const existing = loadJournal();
+  const have = new Set(existing.map((e) => e.id));
+  const added = incoming.filter((e) => !have.has(e.id));
+  const merged = [...existing, ...added].sort((a, z) => z.ts - a.ts).slice(0, 500);
+  try {
+    window.localStorage.setItem(KEY, JSON.stringify(merged));
+  } catch {}
+  return { added: added.length, total: merged.length };
+}
+
+/** A gentle reminder once real data is at risk: never backed up with 5+
+ *  brews logged, or 10+ brews since the last backup. */
+export function backupNudge(entries: JournalEntry[]): string | null {
+  if (entries.length === 0) return null;
+  try {
+    const raw = window.localStorage.getItem(BACKUP_META_KEY);
+    if (!raw) {
+      return entries.length >= 5
+        ? `You've logged ${entries.length} brews and never backed them up — save a backup file so a phone change can't take them.`
+        : null;
+    }
+    const meta = JSON.parse(raw) as { ts?: number; count?: number };
+    const since = entries.length - (meta.count ?? 0);
+    return since >= 10
+      ? `${since} brews since your last backup — a fresh one takes two taps.`
+      : null;
+  } catch {
+    return null;
+  }
 }
 
 export function newId(): string {

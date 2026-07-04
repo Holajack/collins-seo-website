@@ -9,6 +9,12 @@ export default function RegisterSW() {
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("/sw.js").catch(() => {});
     }
+    // Ask the browser to treat this origin's storage as persistent — on an
+    // installed PWA Chrome grants it silently, which protects the journal
+    // and "your usual" from storage-pressure eviction.
+    try {
+      navigator.storage?.persist?.().catch(() => {});
+    } catch {}
   }, []);
   return null;
 }
