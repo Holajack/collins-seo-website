@@ -11,6 +11,11 @@ export interface JournalEntry {
   roaster?: string;
   rating?: number; // 1–5
   notes?: string;
+  /** What went differently from the recipe this time — an accident ("added
+   *  20 g extra water") or an experiment ("used more beans on purpose").
+   *  Rated deviations teach the next brew: keep the change, or follow the
+   *  recipe exactly. */
+  deviation?: string;
 }
 
 const KEY = "pb:journal";
@@ -59,8 +64,92 @@ export function newId(): string {
 // language say, and turn it into concrete next-brew adjustments.
 
 export interface TasteInsight {
-  kind: "dialed" | "adjust" | "beans";
+  kind: "dialed" | "adjust" | "beans" | "deviation";
   text: string;
+}
+
+// ─── Bean tracking ──────────────────────────────────────────────────────────
+// Group the journal by bean (+ roaster when present) so every bag you've
+// bought shows all the ways you've made it, ranked by how it tasted.
+
+export interface BeanWay {
+  label: string; // e.g. "V60 Pour Over · 1:16 · AeroPress Go"
+  count: number;
+  avgRating: number | null;
+  lastTs: number;
+}
+
+export interface BeanProfile {
+  key: string;
+  beans: string;
+  roaster?: string;
+  count: number;
+  avgRating: number | null;
+  best?: JournalEntry; // highest-rated brew of this bean
+  ways: BeanWay[]; // distinct method/ratio/brewer combos, best first
+  deviations: JournalEntry[]; // rated experiments/accidents, newest first
+}
+
+function beanKey(e: JournalEntry): string | null {
+  if (!e.beans?.trim()) return null;
+  return `${e.beans.trim().toLowerCase()}|${(e.roaster ?? "").trim().toLowerCase()}`;
+}
+
+function avg(list: JournalEntry[]): number | null {
+  const rated = list.filter((e) => (e.rating ?? 0) > 0);
+  if (rated.length === 0) return null;
+  return rated.reduce((s, e) => s + (e.rating ?? 0), 0) / rated.length;
+}
+
+export function aggregateBeans(entries: JournalEntry[]): BeanProfile[] {
+  const groups = new Map<string, JournalEntry[]>();
+  for (const e of entries) {
+    const k = beanKey(e);
+    if (!k) continue;
+    groups.set(k, [...(groups.get(k) ?? []), e]);
+  }
+
+  const profiles: BeanProfile[] = [];
+  for (const [key, list] of groups) {
+    const ways = new Map<string, JournalEntry[]>();
+    for (const e of list) {
+      const w = `${e.method} · 1:${e.ratio}${e.brewer ? ` · ${e.brewer}` : ""}`;
+      ways.set(w, [...(ways.get(w) ?? []), e]);
+    }
+    const wayList: BeanWay[] = [...ways.entries()]
+      .map(([label, es]) => ({
+        label,
+        count: es.length,
+        avgRating: avg(es),
+        lastTs: Math.max(...es.map((e) => e.ts)),
+      }))
+      .sort((a, b) => (b.avgRating ?? 0) - (a.avgRating ?? 0) || b.lastTs - a.lastTs);
+
+    const rated = [...list].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
+    profiles.push({
+      key,
+      beans: list[0].beans!.trim(),
+      roaster: list.find((e) => e.roaster?.trim())?.roaster?.trim(),
+      count: list.length,
+      avgRating: avg(list),
+      // Only a genuinely good cup earns a "make it this way" — a 2/5 best
+      // is a bean still being figured out, not a recommendation.
+      best: (rated[0]?.rating ?? 0) >= 4 ? rated[0] : undefined,
+      ways: wayList,
+      deviations: list
+        .filter((e) => e.deviation?.trim())
+        .sort((a, b) => b.ts - a.ts),
+    });
+  }
+
+  // Preference ranking: the beans you rate highest first, ties to the most
+  // recently brewed.
+  return profiles.sort(
+    (a, b) =>
+      (b.avgRating ?? 0) - (a.avgRating ?? 0) ||
+      Math.max(...b.ways.map((w) => w.lastTs)) -
+        Math.max(...a.ways.map((w) => w.lastTs))
+  );
 }
 
 const BITTER_WORDS = /bitter|harsh|astringen|burnt|ashy|over.?extract/i;
@@ -68,12 +157,33 @@ const SOUR_WORDS = /sour|weak|thin|watery|hollow|under.?extract|grassy/i;
 
 export function analyzeJournal(entries: JournalEntry[]): TasteInsight[] {
   const insights: TasteInsight[] = [];
-  if (entries.length < 2) return insights;
 
   const byMethod = new Map<string, JournalEntry[]>();
   for (const e of entries) {
     byMethod.set(e.method, [...(byMethod.get(e.method) ?? []), e]);
   }
+
+  // Deviations teach the very next brew, so they surface even from a single
+  // entry: a badly-rated change means "follow the recipe exactly"; a
+  // well-rated one is worth keeping on purpose.
+  for (const [method, list] of byMethod) {
+    const dev = list.find((e) => e.deviation?.trim() && (e.rating ?? 0) > 0);
+    if (!dev) continue;
+    const what = dev.deviation!.trim();
+    if ((dev.rating ?? 0) <= 3) {
+      insights.push({
+        kind: "deviation",
+        text: `${method}: last time "${what}" and it rated ${dev.rating}/5 — next brew, do exactly what the recipe says and rate it again.`,
+      });
+    } else {
+      insights.push({
+        kind: "deviation",
+        text: `${method}: "${what}" rated ${dev.rating}/5 — that change worked. Try it on purpose next time.`,
+      });
+    }
+  }
+
+  if (entries.length < 2) return insights.slice(0, 6);
 
   for (const [method, list] of byMethod) {
     const rated = list.filter((e) => typeof e.rating === "number" && e.rating! > 0);
@@ -135,10 +245,13 @@ export function analyzeJournal(entries: JournalEntry[]): TasteInsight[] {
   return insights.slice(0, 6);
 }
 
-/** The single most relevant nudge for the calculator, for a given method. */
+/** The single most relevant nudge for the calculator, for a given method.
+ *  A rated deviation wins — it's direct advice about the very next brew —
+ *  then taste adjustments, then the dialed-in confirmation. */
 export function nudgeFor(methodShortName: string): string | null {
   const insights = analyzeJournal(loadJournal());
   const hit =
+    insights.find((i) => i.kind === "deviation" && i.text.startsWith(methodShortName)) ??
     insights.find((i) => i.kind === "adjust" && i.text.startsWith(methodShortName)) ??
     insights.find((i) => i.kind === "dialed" && i.text.startsWith(methodShortName));
   return hit ? hit.text : null;

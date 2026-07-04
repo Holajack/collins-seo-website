@@ -111,6 +111,7 @@ export default function BrewCalculator() {
   const [logRoaster, setLogRoaster] = useState("");
   const [logRating, setLogRating] = useState(0);
   const [logNotes, setLogNotes] = useState("");
+  const [logDeviation, setLogDeviation] = useState("");
   const [copied, setCopied] = useState(false);
   const [journalNudge, setJournalNudge] = useState<string | null>(null);
   // Only a real user interaction may write the "usual" or rewrite the URL —
@@ -942,6 +943,20 @@ export default function BrewCalculator() {
                   rows={2}
                   className="w-full rounded-xl border border-[var(--c-border)] bg-[var(--c-bg)] px-3.5 py-2.5 text-[14px] text-[var(--c-ink)] outline-none placeholder:text-[var(--c-muted)]/70 focus:border-[var(--c-accent)]"
                 />
+                <div>
+                  <input
+                    type="text"
+                    value={logDeviation}
+                    onChange={(e) => setLogDeviation(e.target.value)}
+                    placeholder="Anything go differently? (e.g. added 20 g extra water by accident)"
+                    className="w-full rounded-xl border border-dashed border-[var(--c-accent)]/40 bg-[var(--c-bg)] px-3.5 py-2.5 text-[14px] text-[var(--c-ink)] outline-none placeholder:text-[var(--c-muted)]/70 focus:border-[var(--c-accent)]"
+                  />
+                  <p className="mt-1 text-[11px] leading-relaxed text-[var(--c-muted)]">
+                    Accidents and experiments both count — rate this brew and
+                    the journal will tell you whether to keep the change or
+                    follow the recipe exactly next time.
+                  </p>
+                </div>
                 <div className="flex gap-2">
                   <button
                     onClick={() => {
@@ -958,6 +973,7 @@ export default function BrewCalculator() {
                         roaster: logRoaster.trim() || undefined,
                         rating: logRating || undefined,
                         notes: logNotes.trim() || undefined,
+                        deviation: logDeviation.trim() || undefined,
                       });
                       setLogOpen(false);
                       setLogSaved(true);
@@ -965,6 +981,7 @@ export default function BrewCalculator() {
                       setLogRoaster("");
                       setLogRating(0);
                       setLogNotes("");
+                      setLogDeviation("");
                     }}
                     className="inline-flex min-h-[40px] items-center rounded-full bg-[var(--c-accent)] px-6 text-sm font-semibold text-white transition hover:opacity-90 active:scale-95"
                   >
