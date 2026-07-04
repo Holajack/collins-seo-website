@@ -252,6 +252,47 @@ export const BREWERS: BrewerModel[] = [
     note: "The brunch-table beaker.",
   },
 
+  {
+    id: "espro-p3-18",
+    methodKey: "frenchpress",
+    brand: "Espro",
+    model: "P3",
+    variant: "18 oz",
+    maxWaterMl: 532,
+    capacityKind: "carafe",
+    note: "Double micro-filtered glass press — Espro's 532 ml brew-water spec (444 ml minimum so the basket stays submerged).",
+  },
+  {
+    id: "espro-p3-32",
+    methodKey: "frenchpress",
+    brand: "Espro",
+    model: "P3",
+    variant: "32 oz",
+    maxWaterMl: 946,
+    capacityKind: "carafe",
+    note: "The big glass Espro — 946 ml brew water max, 710 ml minimum.",
+  },
+  {
+    id: "espro-p7-32",
+    methodKey: "frenchpress",
+    brand: "Espro",
+    model: "P7",
+    variant: "32 oz",
+    maxWaterMl: 946,
+    capacityKind: "carafe",
+    note: "Vacuum-insulated stainless — same 946 ml brew spec, keeps the pot hot through the long balanced settle.",
+  },
+  {
+    id: "frieling-36",
+    methodKey: "frenchpress",
+    brand: "Frieling",
+    model: "Double-Wall Stainless",
+    variant: "36 oz",
+    maxWaterMl: 1065,
+    capacityKind: "carafe",
+    note: "The buy-it-once German stainless press; double wall holds temperature beautifully.",
+  },
+
   // ── Cold brew vessels — cap applies to the STEEP water (the concentrate)
   {
     id: "mizudashi-600",

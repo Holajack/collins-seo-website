@@ -634,5 +634,362 @@ export const FLORIDA_SHOPS: CoffeeShop[] = [
       }
     ],
     "offers": "Monthly coffee subscription: choose one to four 12 oz bags (or a 5 lb bag) of micro-roasted specialty coffee, roasted and shipped within 48 hours of the start date, recurring monthly, cancel anytime. Also offers a customizable Coffee Sampler Box with three 4 oz samples."
+  },
+
+  {
+    "name": "Methodical Coffee",
+    "city": "Greenville, SC",
+    "region": "sc",
+    "website": "https://methodicalcoffee.com",
+    "summary": "Greenville's flagship specialty roaster and multi-cafe operation (Downtown, Commons, Stones Point, plus a bakery), roasting to order and shipping nationwide.",
+    "roastsOwn": true,
+    "beans": [
+      {
+        "name": "Blue Boy",
+        "notes": "Chocolate, Graham, Brown Sugar — Methodical's best-selling house blend; smooth chocolate graham cracker, silky creme caramel, velvety vanilla finish.",
+        "roastLevel": "Medium",
+        "origin": "Blend"
+      },
+      {
+        "name": "Belly Warmer",
+        "notes": "Dark Chocolate, Almond Butter — equal parts Honduran and Brazilian coffees in a nutty, chocolatey cup.",
+        "roastLevel": "Dark",
+        "origin": "Blend (Honduras + Brazil)"
+      },
+      {
+        "name": "Play Nice",
+        "notes": "Chocolate, Brown Sugar, Berries.",
+        "roastLevel": "Medium",
+        "origin": "Blend"
+      }
+    ],
+    "offers": ""
+  },
+  {
+    "name": "Due South Coffee Roasters",
+    "city": "Greenville, SC (Hampton Station)",
+    "region": "sc",
+    "website": "https://duesouthcoffee.com",
+    "summary": "Roasting thoughtful, forward-thinking specialty coffee in South Carolina since 2013, with a taproom-style cafe and roastery at Hampton Station in Greenville.",
+    "roastsOwn": true,
+    "beans": [
+      {
+        "name": "Waxwing Blend (Formerly Night Train)",
+        "notes": "Baker's Chocolate, Strawberry, Creamy — balanced chocolate and berry sweetness from their Brazilian and Ethiopian coffees.",
+        "roastLevel": "Medium",
+        "origin": "Blend (Brazil & Ethiopia)"
+      },
+      {
+        "name": "Guji | Ethiopia",
+        "notes": "Peach, Clementine, Juicy — classic black tea, citrus, and fruit notes of a washed Ethiopian.",
+        "roastLevel": "Light",
+        "origin": "Ethiopia (Guji, washed)"
+      },
+      {
+        "name": "Nightjar Blend",
+        "notes": "Dark Chocolate, Clove, Syrupy — their official dark roast blend.",
+        "roastLevel": "Dark",
+        "origin": "Blend"
+      }
+    ],
+    "offers": "Single Origin and Blend coffee subscriptions available (Blend Subscription from $18.25); free shipping on all orders over $50 in the Contiguous USA."
+  },
+  {
+    "name": "Bridge City Coffee",
+    "city": "Greenville, SC (plus Travelers Rest)",
+    "region": "sc",
+    "website": "https://www.bridgecity.coffee",
+    "summary": "Mission-driven Greenville roaster and cafe group founded in 2017 — named 2024 Roast Magazine Micro-Roaster of the Year — committed to ethical partnerships and community impact.",
+    "roastsOwn": true,
+    "beans": [
+      {
+        "name": "Brazil Classico",
+        "notes": "Dark chocolate, cocoa, roasted almond & hazelnut.",
+        "roastLevel": "Medium-Dark",
+        "origin": "Brazil"
+      },
+      {
+        "name": "Peru Lucero",
+        "notes": "Semi-dry white wine, smooth caramel, and milk chocolate.",
+        "roastLevel": "Medium",
+        "origin": "Peru"
+      },
+      {
+        "name": "El Salvador Ojo de Agua (Dehydrated Honey Process)",
+        "notes": "Raspberry, blackberry, and marmalade with a hint of prunes.",
+        "roastLevel": "Light-Medium",
+        "origin": "El Salvador"
+      }
+    ],
+    "offers": "Bridge City Coffee Club subscription (weekly, bi-weekly, or monthly deliveries from $21, adjustable or pausable anytime) plus limited Rare Reserve / ultra-rare coffee releases (geisha, wush wush) shipped to your door."
+  },
+  {
+    "name": "Little River Roasting Co.",
+    "city": "Spartanburg, SC",
+    "region": "sc",
+    "website": "https://www.littleriverroasting.com",
+    "summary": "Spartanburg's original small-batch specialty roaster (since 2001), with four cafe locations and 'Farmer Friendly' direct-relationship sourcing that pays above market price.",
+    "roastsOwn": true,
+    "beans": [
+      {
+        "name": "Little River Blend",
+        "notes": "Costa Rica and Peru coffees roasted medium — a cup full of chocolate and citrus with a nutty finish.",
+        "roastLevel": "Medium",
+        "origin": "Costa Rica + Peru"
+      },
+      {
+        "name": "Little River Espresso Blend",
+        "notes": "A sweet, syrupy, nutty espresso, perfect for adding flavors or drinking as is.",
+        "roastLevel": "Light-Medium",
+        "origin": "Blend"
+      }
+    ],
+    "offers": "Online shop at shop.littleriverroasting.com selling fresh-roasted coffee, breakfast/lunch, and merch; wholesale program; four Spartanburg cafe locations."
+  },
+  {
+    "name": "Mōzza Roasters",
+    "city": "Spartanburg, SC",
+    "region": "sc",
+    "website": "https://mozzaroasters.com",
+    "summary": "Spartanburg small-batch roaster that roasts to order (beans roasted 1-3 days before shipping) and supplies partner cafes across the Upstate while shipping direct to subscribers.",
+    "roastsOwn": true,
+    "beans": [
+      {
+        "name": "Nightfall Blend",
+        "notes": "Rich notes of tobacco and chocolate with a touch of spice on the finish; full-bodied, well-balanced, smooth cup.",
+        "roastLevel": "Medium-Dark",
+        "origin": "Indonesia + Africa"
+      },
+      {
+        "name": "Aurora Blend",
+        "notes": "Bestselling medium roast with mild chocolate, honeycomb, brown sugar, and a touch of Meyer lemon.",
+        "roastLevel": "Medium",
+        "origin": "Colombia + Guatemala"
+      },
+      {
+        "name": "Noble Blend",
+        "notes": "Deep notes of dark chocolate and a hint of ripe blackberry; smooth, full-bodied with a velvety finish.",
+        "roastLevel": "Medium-Dark",
+        "origin": "Colombia + Ethiopia"
+      }
+    ],
+    "offers": "Coffee subscriptions with 10% off every subscription order; choose your roast (or let the roaster pick), grind, and delivery frequency (weekly, biweekly, monthly); skip, pause, or cancel anytime; beans roasted to order in small batches 1-3 days before shipping. Also offers wholesale to cafes/restaurants and barista training."
+  },
+  {
+    "name": "Second State Coffee",
+    "city": "Charleston, SC",
+    "region": "sc",
+    "website": "https://secondstatecoffee.com/",
+    "summary": "Charleston's flagship specialty roaster (founded 2012) with five cafes and a James Island roastery, roasting light-to-medium on a Loring S15 Falcon with relationship-based sourcing.",
+    "roastsOwn": true,
+    "beans": [
+      {
+        "name": "Stealth — Blend",
+        "notes": "Very traditional, approachable, full velvety body, low acid, sweet — majority Brazil lends full body, syrupy mouthfeel, and wonderful sweetness.",
+        "roastLevel": "More developed roast",
+        "origin": "25% washed Guatemala (Antigua) + 75% natural Brazil (Minas Gerais)"
+      },
+      {
+        "name": "Heavyweight — Blend",
+        "notes": "Very traditional, approachable, med-full body, low acid, fudgey — their most popular coffee, on the menu since day one of roasting.",
+        "roastLevel": "Traditional/developed roast",
+        "origin": "Blend"
+      },
+      {
+        "name": "Prizefighter — Blend",
+        "notes": "Nutty, classic, lightly floral, medium sweet.",
+        "roastLevel": "Medium-dark (more developed roast)",
+        "origin": "Colombia + Brazil + Ethiopia"
+      }
+    ],
+    "offers": "Coffee subscriptions with weekly, bi-weekly, or monthly frequency; tax and shipping included on all subscriptions; dedicated Heavyweight subscription product and a Coffee Subscriptions collection on the shop."
+  },
+  {
+    "name": "Foresight Coffee Roasters (formerly Springbok)",
+    "city": "Charleston, SC",
+    "region": "sc",
+    "website": "https://foresightcoffee.com/",
+    "summary": "Charleston's upper King Street small-batch roaster (roasting in the Lowcountry since 2015 as Springbok, now Foresight), partnering directly with producers for traceable lots.",
+    "roastsOwn": true,
+    "beans": [
+      {
+        "name": "Paradigm Blend",
+        "notes": "Baker's chocolate, brown sugar and ripe plum; full-bodied and rich with mild acidity.",
+        "roastLevel": "Medium-dark",
+        "origin": "Central America & South America blend"
+      },
+      {
+        "name": "Brazilliant Blend",
+        "notes": "Roasted dark (but not burnt) to enhance rich chocolate and praline notes; great for cold brew, espresso, and filter.",
+        "roastLevel": "Dark"
+      },
+      {
+        "name": "Panama - La Santa",
+        "notes": "Light, bright and delicious; works beautifully as a pour over or drip.",
+        "roastLevel": "Light",
+        "origin": "Panama"
+      }
+    ],
+    "offers": "Coffee subscriptions (Blends, Single Origin, and Roaster's Choice plans) with free shipping on subscription orders over $40 (excluding wholesale)."
+  },
+  {
+    "name": "Highfalutin Coffee Roasters",
+    "city": "Charleston, SC (Avondale/West Ashley + James Island)",
+    "region": "sc",
+    "website": "https://highfalutin.com/",
+    "summary": "Founded in 2018 in West Ashley's Avondale neighborhood, Highfalutin exclusively sources a highly curated selection of top-tier micro lots and roasts for clean, sweet, floral and fruity cups.",
+    "roastsOwn": true,
+    "beans": [
+      {
+        "name": "Nativo Nogales",
+        "notes": "Strawberry thyme lemonade",
+        "origin": "Pitalito, Huila, Colombia (Mosto process, Caturra)"
+      },
+      {
+        "name": "Wilder Lazo SL28",
+        "notes": "Pomegranate & pistachio",
+        "origin": "Huila, Colombia (natural anaerobic, ~200-hour fermentation)"
+      },
+      {
+        "name": "Bura Hamasho",
+        "notes": "Floral aromatics, tea-like body, honeydew melon sweetness",
+        "origin": "Sidama, Ethiopia (organic, natural process, Grade 1)"
+      }
+    ],
+    "offers": "Gift cards (e-gift, from $10, via highfalutin.com/products/gift-card) and Palate Development Class (highfalutin.com/products/event). No subscription program seen."
+  },
+  {
+    "name": "Charleston Coffee Roasters",
+    "city": "Charleston, SC (North Charleston roastery)",
+    "region": "sc",
+    "website": "https://www.charlestoncoffeeroasters.com/",
+    "summary": "Long-running slow-roasted, small-batch roaster known for organic blends and single origins, sold online and in grocers across the Southeast.",
+    "roastsOwn": true,
+    "beans": [
+      {
+        "name": "Charleston Organic Blend",
+        "notes": "Bright lemony citrus notes with nuttiness, a touch of caramel sweetness and smooth smokiness; smooth, bright everyday cup.",
+        "roastLevel": "Medium",
+        "origin": "Organic blend of beans from North, Central and South America (certified organic farms)"
+      },
+      {
+        "name": "Kiawah Organic Blend",
+        "notes": "Rich, full-bodied dark roast with chocolate overtones and a smooth aftertaste.",
+        "roastLevel": "Dark",
+        "origin": "Organic blend"
+      }
+    ],
+    "offers": "Coffee subscription (charlestoncoffeeroasters.com/subscribe/) with 10% subscriber discount on all orders and occasional exclusive promotions; Coffee of the Month Club delivering two 12 oz bags of freshly roasted seasonal favorites monthly with tasting and origin notes in a gift box, terms of 3/6/9/12 months or until cancel, code CLUB20 for 20% off first shipment; free shipping on orders of $20+."
+  },
+  {
+    "name": "Sightsee",
+    "city": "Charleston, SC (698 Rutledge Ave)",
+    "region": "sc",
+    "website": "https://www.sightseeshop.com/",
+    "summary": "Travel-inspired retail shop and coffee bar near Hampton Park serving craft coffee from local and regional roasters, with a house blend and rotating featured whole beans.",
+    "roastsOwn": false,
+    "beans": [
+      {
+        "name": "Sightsee House Blend",
+        "notes": "Mixed berries, bright citrus, and velvety chocolate; designed to work on any brew method from espresso to drip to french press",
+        "origin": "Ethiopia (natural process) + Colombia (washed) — roasted in partnership with Brandywine Coffee Roasters"
+      }
+    ],
+    "offers": "Sightsee Coffee Subscription: monthly delivery of the featured guest coffee, the featured Springbok Coffee Roasters coffee, or both, with a customized coffee guide including brewing instructions based on the shop's dial-in; shipping included."
+  },
+  {
+    "name": "Curiosity Coffee Bar",
+    "city": "Columbia, SC",
+    "region": "sc",
+    "website": "https://www.curiositycoffeebar.com/",
+    "summary": "Neighborhood coffee shop and bar on North Main Street serving ethically sourced single-origin coffee plus beer, wine, and locally sourced food.",
+    "roastsOwn": false,
+    "beans": [
+      {
+        "name": "Bless Your Heart - Tanzania (Curiosity x 1000 Faces Coffee)",
+        "notes": "Their signature coffee, described as always nutty/chocolatey with supreme versatility; sourced from Mount Kilimanjaro Estate on the southern slopes of Kilimanjaro (per the site's indexed product page — direct page load blocked by bot protection).",
+        "origin": "Tanzania (Mount Kilimanjaro Estate)"
+      }
+    ],
+    "offers": "Retail bean product pages live on its own site (e.g. curiositycoffeebar.com/product/bless-your-heart-tanzania-curiosity-x-1000-faces-coffee and /product/bless-your-dark-heart-tanzania), confirming the 1000 Faces collaboration roast; curiosityco.shop also resolves as their shop. No subscription program seen. All confirmed via indexed pages only — the site returns 403 to automated fetchers."
+  },
+  {
+    "name": "Loveland Coffee",
+    "city": "Irmo / Columbia, SC",
+    "region": "sc",
+    "website": "https://www.lovelandcoffee.com/",
+    "summary": "Fair Trade Organic specialty roaster with a two-floor roastery cafe in Irmo and a drive-thru kiosk on St. Andrews Road in Columbia, roasting small-batch since 2016.",
+    "roastsOwn": true,
+    "beans": [
+      {
+        "name": "Soda City Sunrise",
+        "notes": "Signature house blend named after Columbia, SC; smooth mild flavors of caramel and chocolate with a lemon citric finish (from lovelandcoffee.com/product/soda-city-sunrise/).",
+        "roastLevel": "Medium",
+        "origin": "Latin & South American blend"
+      },
+      {
+        "name": "Bourbon Barrel-Aged Brazilian",
+        "notes": "Fair Trade Organic Brazilian coffee aged in bourbon barrels in partnership with Columbia's Crouch Distilling; mentioned on lovelandcoffee.com (Our Story), no cupping notes published.",
+        "origin": "Brazil"
+      }
+    ],
+    "offers": "Soda City Sunrise coffee subscription sold online (lovelandcoffee.com/product/soda-city-sunrise-subscription/); wholesale accounts via lovelandcoffee.com/wholesale/."
+  },
+  {
+    "name": "Piecewise Coffee Co.",
+    "city": "Cayce & Columbia, SC",
+    "region": "sc",
+    "website": "https://piecewisecoffee.com/",
+    "summary": "Intentionally local coffee shop with locations in Cayce (State Street) and on Devine Street in Columbia, serving South Carolina roasters and neighborhood-baked goods.",
+    "roastsOwn": false,
+    "beans": [
+      {
+        "name": "The Daily Driver (exclusive Piecewise Blend)",
+        "notes": "Described on the site as a smooth, balanced roast you can't find anywhere else.",
+        "origin": "Co-created with Methodical Coffee, Greenville, SC"
+      }
+    ],
+    "offers": "Mobile coffee bar catering and coffee delivery in and around Cayce and Columbia, SC (catering bar includes espresso, cold brew, house-made syrups, alternative milks, and chai); mobile order-ahead via the Piecewise Coffee App on iOS/Android (powered by the joe coffee platform) with a loyalty program (50% off after 6th purchase)."
+  },
+  {
+    "name": "Rock Hill Coffee Roasters",
+    "city": "Rock Hill, SC",
+    "region": "sc",
+    "website": "https://www.rockhill.coffee/",
+    "summary": "Specialty roaster and community-focused cafe in downtown Rock Hill (with a Fort Mill location), roasting signature blends and single origins in-house alongside seasonal drinks and house-made syrups.",
+    "roastsOwn": true,
+    "beans": [
+      {
+        "name": "The House Blend",
+        "notes": "Citrus, hazelnut, and chocolate; smooth and balanced blend of Peruvian and Colombian beans",
+        "origin": "Peru and Colombia"
+      },
+      {
+        "name": "The Espresso Blend",
+        "notes": "Dried cherry, chocolate, balanced",
+        "roastLevel": "Medium/Dark"
+      }
+    ],
+    "offers": "Online bean shop (Shop / Shop Coffee pages) with online ordering at rockhill.coffee/s/order, plus a Stockists page listing local retailers. Indexed site copy also advertises a coffee subscription (\"never need to remember to order coffee again\"), contradicting the researcher's note that no subscription was found. Note: bean details and offers were confirmed from search-indexed snippets of the site's own pages, since the site returns 403 to automated fetchers."
+  },
+  {
+    "name": "Birchin Lane Coffee Company",
+    "city": "Myrtle Beach, SC",
+    "region": "sc",
+    "website": "https://www.birchinlanecoffee.com/",
+    "summary": "Award-winning small-batch roaster with a full-service espresso bar on N Kings Hwy in Myrtle Beach, offering signature blends, single origins, and flavored beans.",
+    "roastsOwn": true,
+    "beans": [
+      {
+        "name": "Birchin Lane Blend",
+        "notes": "Signature award-winning roast with a smooth mouth feel and low acidity; billed as a perfect cup any time of day."
+      },
+      {
+        "name": "Beach Beans",
+        "notes": "Well-balanced and complex roast, 'blended for wherever the salt life takes you' ($15.95).",
+        "roastLevel": "Medium/dark"
+      }
+    ],
+    "offers": "\"Three and Slap Your Knee\" coffee subscription: pick any 3 of their coffees, shipped once a month, $45.95 (product page on birchinlanecoffee.com)."
   }
 ];

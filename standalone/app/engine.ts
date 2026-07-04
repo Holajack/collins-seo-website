@@ -145,7 +145,7 @@ export function calculateBrew(
     : 0;
   const brewWaterG = totalWaterG - bloomWaterG;
 
-  const steps = buildPourSchedule(method, coffeeG, totalWaterG, bloomWaterG);
+  const steps = buildPourSchedule(method, coffeeG, totalWaterG, bloomWaterG, style);
 
   return {
     method,
@@ -212,6 +212,19 @@ function coldBrewSolve(
   };
 }
 
+// French press timing is style-dependent (verified against Hoffmann-method
+// research + an adversarial critic): bold decants right after the crust
+// break; balanced settles the full nine minutes; light extends the steep to
+// lift extraction WITHOUT grinding finer.
+export function frenchPressPlan(style: StyleKey) {
+  const plans = {
+    strong: { breakAtSec: 240, pressAtSec: 255, pressDurSec: 25, totalSec: 280 },
+    balanced: { breakAtSec: 240, pressAtSec: 540, pressDurSec: 20, totalSec: 560 },
+    light: { breakAtSec: 240, pressAtSec: 360, pressDurSec: 25, totalSec: 385 },
+  } as const;
+  return plans[style];
+}
+
 /**
  * Build a timed pour schedule. Hot pour-over style methods get a bloom + a
  * number of pulse pours sized to the brewer. Immersion methods (AeroPress,
@@ -221,47 +234,39 @@ function buildPourSchedule(
   method: BrewMethod,
   coffeeG: number,
   totalWaterG: number,
-  bloomWaterG: number
+  bloomWaterG: number,
+  style: StyleKey = "balanced"
 ): PourStep[] {
   const steps: PourStep[] = [];
 
-  // French press gets its own staged timeline: bloom -> fill -> break the
-  // crust & skim -> slow press. The press moment is what shapes the cup.
+  // French press: fill -> crust break & skim at 4:00 -> style-timed press.
+  // No separate bloom — the crust that forms on top IS the bloom, and
+  // breaking it at 4:00 is what ends its steep. The press moment is the
+  // style lever: right away for bold, ~6:00 for light, ~9:00 for balanced.
   if (method.key === "frenchpress") {
-    const bloomG = method.bloom.applies ? round(bloomWaterG) : 0;
-    const t = method.totalBrewTimeSec.high; // press lands at the end
-    if (bloomG > 0) {
-      steps.push({
-        label: "Bloom & stir",
-        atSec: 0,
-        waterToG: bloomG,
-        addG: bloomG,
-        detail: `${round(method.bloom.timeSec)}s rest. ${method.bloom.technique}`,
-      });
-    }
+    const plan = frenchPressPlan(style);
     steps.push({
-      label: "Fill",
-      atSec: method.bloom.timeSec,
+      label: "Fill — all at once",
+      atSec: 0,
       waterToG: round(totalWaterG),
-      addG: round(totalWaterG - bloomG),
+      addG: round(totalWaterG),
       detail:
-        "Pour to the target weight, put the lid on with the plunger raised, and leave it alone — no stirring yet.",
+        "One steady pour to the target weight, wetting everything. No stirring — a crust of grounds will form on top; that crust is your bloom. Lid on, plunger up.",
     });
     steps.push({
       label: "Break the crust & skim",
-      atSec: 240,
+      atSec: plan.breakAtSec,
       waterToG: round(totalWaterG),
       addG: 0,
       detail:
-        "Push the crust gently with a spoon (2–3 strokes), then skim off the floating foam and grounds. This drops the bed and stops the crust from over-steeping.",
+        "Push the crust gently with a spoon (2–3 strokes) and skim off the floating foam and stray grounds. The bed drops and the heavy steeping ends.",
     });
     steps.push({
       label: "Press — slowly",
-      atSec: Math.max(300, t - 30),
+      atSec: plan.pressAtSec,
       waterToG: round(totalWaterG),
       addG: 0,
-      detail:
-        "Press over ~20–30s, stopping at the liquid's surface — don't crush the bed. Pour every cup immediately so it stops extracting.",
+      detail: `Press over ~${plan.pressDurSec}s, stopping at the liquid's surface — don't crush the bed. Then pour every cup immediately so it stops extracting.`,
     });
     return steps;
   }

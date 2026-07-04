@@ -19,6 +19,7 @@ import {
   assessFit,
   buildBypassSteps,
   calculateFromDose,
+  frenchPressPlan,
 } from "./engine";
 import { brewersFor, getBrewer } from "./brewers";
 import { newId, nudgeFor, saveEntry } from "./journal-store";
@@ -253,6 +254,12 @@ export default function BrewCalculator() {
   const brewer = brewerId ? getBrewer(brewerId) : undefined;
   const activeBrewer = brewer && brewer.methodKey === methodKey ? brewer : undefined;
   const fit = activeBrewer ? assessFit(result, activeBrewer) : null;
+  // French press total time is style-dependent (bold ~4:40, light ~6:25,
+  // balanced ~9:20); every other method uses its fixed target.
+  const timerTotalSec =
+    methodKey === "frenchpress"
+      ? frenchPressPlan(inputMode === "dose" ? "balanced" : style).totalSec
+      : method.totalBrewTimeSec.high;
   const timerSteps =
     fit?.plan === "bypass" && fit.bypass
       ? buildBypassSteps(
@@ -749,13 +756,13 @@ export default function BrewCalculator() {
                   {method.isImmersion ? "Steps & timer" : "Pour schedule & timer"}
                 </h3>
                 <span className="text-[12px] text-[var(--c-muted)]">
-                  target total ~{formatTime(method.totalBrewTimeSec.high)}
+                  target total ~{formatTime(timerTotalSec)}
                 </span>
               </div>
               <BrewTimer
-                key={`${methodKey}-${result.ratio}-${result.totalWaterG}-${fit?.plan ?? "none"}`}
+                key={`${methodKey}-${result.ratio}-${result.totalWaterG}-${fit?.plan ?? "none"}-${timerTotalSec}`}
                 steps={timerSteps}
-                totalSec={method.totalBrewTimeSec.high}
+                totalSec={timerTotalSec}
                 isImmersion={method.isImmersion}
               />
             </div>
