@@ -7,7 +7,13 @@
 // Values reconciled against a manufacturer-spec research + critic pass.
 // ─────────────────────────────────────────────────────────────────────────
 
-export type CapacityKind = "chamber" | "bulb" | "server" | "vessel" | "carafe";
+export type CapacityKind =
+  | "chamber"
+  | "bulb"
+  | "server"
+  | "vessel"
+  | "carafe"
+  | "open"; // dripper that sits on any mug — limited only by the cup below it
 
 export interface BrewerModel {
   id: string;
@@ -63,12 +69,35 @@ export const BREWERS: BrewerModel[] = [
     note: "Double-size chamber rated 20 oz (591 ml) — a 12 oz mug fits in one press.",
   },
 
-  // ── Hario V60 — sized by the range server the brew drains into
+  // ── Hario V60 — the dripper itself sits on any mug (no fixed limit); only
+  //    the full range-server SETS cap the brew (the server it drains into).
+  {
+    id: "v60-dripper-02",
+    methodKey: "pourover_v60",
+    brand: "Hario",
+    model: "V60 dripper (02)",
+    variant: "on any mug",
+    maxWaterMl: 0,
+    capacityKind: "open",
+    note: "Just the plastic cone on top of your cup — the travel-friendly way. No capacity limit; brew straight into any mug big enough to hold the finished coffee.",
+  },
+  {
+    id: "v60-dripper-01",
+    methodKey: "pourover_v60",
+    brand: "Hario",
+    model: "V60 dripper (01)",
+    variant: "on any mug",
+    maxWaterMl: 0,
+    capacityKind: "open",
+    note: "The single-cup cone on your mug. No limit beyond the cup — best kept to ~1–2 cups so the small cone doesn't back up.",
+  },
+
+  // ── V60 range-server SETS — here the server it drains into is the cap
   {
     id: "v60-01",
     methodKey: "pourover_v60",
     brand: "Hario",
-    model: "V60-01",
+    model: "V60-01 + server",
     variant: "1–2 cups",
     maxWaterMl: 360,
     capacityKind: "server",
@@ -78,7 +107,7 @@ export const BREWERS: BrewerModel[] = [
     id: "v60-02",
     methodKey: "pourover_v60",
     brand: "Hario",
-    model: "V60-02",
+    model: "V60-02 + server",
     variant: "1–4 cups",
     maxWaterMl: 600,
     capacityKind: "server",
@@ -88,7 +117,7 @@ export const BREWERS: BrewerModel[] = [
     id: "v60-03",
     methodKey: "pourover_v60",
     brand: "Hario",
-    model: "V60-03",
+    model: "V60-03 + server",
     variant: "1–6 cups",
     maxWaterMl: 800,
     capacityKind: "server",

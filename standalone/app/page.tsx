@@ -65,7 +65,7 @@ export default function HomePage() {
               gram of it.
             </p>
             <p className="mt-3 text-[13px] font-medium text-[var(--c-muted)]">
-              V60 · Chemex · Siphon · AeroPress · Cold brew — with the exact
+              V60 · Chemex · Siphon · AeroPress · French press · Cold brew — with the exact
               dose, bloom, temperature, grind, and a live pour timer.
             </p>
           </div>

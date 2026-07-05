@@ -259,14 +259,21 @@ function buildPourSchedule(
       waterToG: round(totalWaterG),
       addG: 0,
       detail:
-        "Push the crust gently with a spoon (2–3 strokes) and skim off the floating foam and stray grounds. The bed drops and the heavy steeping ends.",
+        "Push the crust gently with a spoon (2–3 strokes) and skim off the floating foam and stray grounds. The grounds now sink, so extraction largely plateaus — the wait from here is about letting fines settle for a cleaner cup.",
     });
+    const settleWait = plan.pressAtSec - plan.breakAtSec;
     steps.push({
-      label: "Press — slowly",
+      label:
+        style === "strong" ? "Pour now (rustic)" : "Rest the plunger & pour",
       atSec: plan.pressAtSec,
       waterToG: round(totalWaterG),
       addG: 0,
-      detail: `Press over ~${plan.pressDurSec}s, stopping at the liquid's surface — don't crush the bed. Then pour every cup immediately so it stops extracting.`,
+      detail:
+        style === "strong"
+          ? "Lower the plunger just to the surface — do NOT plunge to the bottom — and pour right away. Decanting this early keeps the most body but also the most sediment, for a bold, rustic cup."
+          : `Fines have had ~${Math.round(
+              settleWait / 60
+            )} min to settle. Lower the plunger only until the mesh rests on the surface — never plunge to the bottom, or you'll stir the silt back up — then pour off the clean coffee. Serve every cup so it stops extracting.`,
     });
     return steps;
   }
@@ -743,7 +750,9 @@ export interface BrewerLike {
   brand: string;
   model: string;
   maxWaterMl: number;
-  capacityKind: "chamber" | "bulb" | "server" | "vessel" | "carafe";
+  // "open" = a dripper that sits on any mug (no fixed vessel) — the only
+  // limit is that the cup underneath holds the finished volume.
+  capacityKind: "chamber" | "bulb" | "server" | "vessel" | "carafe" | "open";
 }
 
 export interface FitReport {
@@ -767,11 +776,26 @@ export function assessFit(result: BrewResult, brewer: BrewerLike): FitReport {
   //  server       — the finished brew drains into it
   //  vessel       — the steep water (cold brew concentrate)
   const usedMl =
-    brewer.capacityKind === "server"
+    brewer.capacityKind === "server" || brewer.capacityKind === "open"
       ? result.finishedVolumeMl
       : brewer.capacityKind === "vessel"
       ? result.brewWaterG
       : result.totalWaterG;
+
+  // Open dripper on a mug: never a hard limit — just size the cup. Recommend a
+  // mug that holds the finished volume plus a little headroom so it doesn't
+  // brim while the last of the water drips through.
+  if (brewer.capacityKind === "open") {
+    const needMl = Math.ceil((result.finishedVolumeMl + 40) / 10) * 10;
+    const needOz = Math.ceil(needMl / OZ_TO_ML);
+    return {
+      fits: true,
+      plan: "ok",
+      usedMl: result.finishedVolumeMl,
+      capacityMl: needMl,
+      message: `No capacity limit — the ${name} sits right on your cup. Just brew into a mug that holds at least ~${needOz} oz (${needMl} ml) so it won't overflow while it drips.`,
+    };
+  }
 
   if (usedMl <= cap) {
     return {

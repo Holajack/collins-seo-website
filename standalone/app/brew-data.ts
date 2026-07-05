@@ -168,15 +168,15 @@ const METHODS: Record<BrewMethodKey, BrewMethod & { shortName: string }> = {
       technique: "",
     },
     pourSchedule:
-      "Pour all the water in one steady pour — no stirring; a crust forms on top and that crust is your bloom. At 4:00 break it with a spoon and skim the foam. Then the press timing sets the style: bold presses right away and decants immediately; light presses at ~6:00; balanced lets it settle until ~9:00. Always press slowly, only to the liquid's surface.",
+      "Pour all the water in one steady pour — no stirring; a crust forms on top and that crust is your bloom. At 4:00 break it with a spoon and skim the foam, and the grounds sink. Strength is set by your RATIO (1:12 bold → 1:17 light); the wait before you pour controls CLARITY, not strength — the longer the fines settle, the cleaner the cup. Never plunge the mesh to the bottom: rest it at the surface and pour off the clean coffee.",
     totalBrewTimeSec: { low: 280, high: 560 },
     isImmersion: true,
     notes: [
-      "Bold & rich: 1:12, press right after the 4:00 crust break, decant immediately.",
-      "Balanced: 1:15, break at 4:00, press at ~9:00 — the long settle drops fines for a much cleaner cup.",
-      "Light but flavorful: 1:17, press at ~6:00 with water at the hot end (203–205°F). Extend the steep — never the grind — to lift extraction.",
-      "Press slowly for ~20–25s and stop at the liquid's surface — plunging hard stirs up silt.",
-      "Pour every cup right away; coffee sitting on the bed keeps extracting and turns bitter.",
+      "Strength comes from the ratio, not the timing: 1:12 for bold & rich, 1:15 balanced, 1:17 light-but-flavorful.",
+      "The wait after the 4:00 crust break is a clarity dial. Pour right away for a bold, rustic, sediment-heavy cup; wait to ~6:00 for a cleaner one; ~9:00 (Hoffmann) for the cleanest, silt-free cup.",
+      "Never plunge to the bottom — lower the mesh only to the surface and pour. Plunging re-suspends the fines you just let settle and adds bitterness.",
+      "For a light-but-flavorful cup keep the grind medium-coarse and use hot water (203–205°F) — lift flavor with heat and ratio, not a finer grind.",
+      "Pour every cup right away; coffee left sitting on the bed keeps extracting and turns bitter.",
     ],
     tasteSummary:
       "Heavy-bodied, rich, and textured — the fullest expression of the bean.",

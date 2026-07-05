@@ -16,6 +16,7 @@ import {
   type TargetMode,
 } from "./engine";
 import BrewTimer from "./BrewTimer";
+import RatingStars from "./RatingStars";
 import {
   assessFit,
   buildBypassSteps,
@@ -924,22 +925,9 @@ export default function BrewCalculator() {
                     className="w-full rounded-xl border border-[var(--c-border)] bg-[var(--c-bg)] px-3.5 py-2.5 text-[14px] text-[var(--c-ink)] outline-none placeholder:text-[var(--c-muted)]/70 focus:border-[var(--c-accent)]"
                   />
                 </div>
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-2">
                   <span className="c-label mr-1">Rating</span>
-                  {[1, 2, 3, 4, 5].map((n) => (
-                    <button
-                      key={n}
-                      onClick={() => setLogRating(n === logRating ? 0 : n)}
-                      aria-label={`${n} of 5`}
-                      className={`flex h-9 w-9 items-center justify-center rounded-full text-lg transition ${
-                        n <= logRating
-                          ? "text-[var(--c-accent-ink)]"
-                          : "text-[var(--c-border)]"
-                      }`}
-                    >
-                      ●
-                    </button>
-                  ))}
+                  <RatingStars value={logRating} onChange={setLogRating} />
                 </div>
                 <textarea
                   value={logNotes}

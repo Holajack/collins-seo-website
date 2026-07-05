@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import RatingStars from "../RatingStars";
 import {
   aggregateBeans,
   analyzeJournal,
@@ -11,6 +12,7 @@ import {
   importBackup,
   loadJournal,
   markBackedUp,
+  updateEntry,
   type BeanProfile,
   type JournalEntry,
 } from "../journal-store";
@@ -263,65 +265,169 @@ export default function JournalClient() {
       ) : (
         <ul className="mt-4 space-y-3">
           {entries.map((e) => (
-            <li
-              key={e.id}
-              className="rounded-2xl border border-[var(--c-border)] bg-[var(--c-card)] p-5"
-            >
-              <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <div className="text-[15px] font-bold text-[var(--c-ink)]">
-                  {e.beans || e.method}
-                  {e.roaster && (
-                    <span className="font-normal text-[var(--c-muted)]">
-                      {" "}
-                      · {e.roaster}
-                    </span>
-                  )}
-                </div>
-                <span className="text-[12px] text-[var(--c-muted)]">
-                  {new Date(e.ts).toLocaleDateString(undefined, {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                  })}
-                </span>
-              </div>
-
-              <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-[var(--c-muted)]">
-                <span>{e.method}</span>
-                {e.brewer && <span>· {e.brewer}</span>}
-                <span className="font-mono">· 1:{e.ratio}</span>
-                <span className="font-mono">· {e.oz} oz</span>
-                {typeof e.rating === "number" && e.rating > 0 && (
-                  <RatingDots value={e.rating} />
-                )}
-              </div>
-
-              {e.deviation && (
-                <p className="mt-2 rounded-lg border border-dashed border-[var(--c-accent)]/40 bg-[var(--c-accent)]/[0.05] px-3 py-1.5 text-[12px] leading-relaxed text-[var(--c-muted)]">
-                  <span className="font-semibold text-[var(--c-accent-ink)]">
-                    Went differently:{" "}
-                  </span>
-                  {e.deviation}
-                </p>
-              )}
-
-              {e.notes && (
-                <p className="mt-2 text-[13px] leading-relaxed text-[var(--c-muted)]">
-                  {e.notes}
-                </p>
-              )}
-
-              <button
-                onClick={() => setEntries(deleteEntry(e.id))}
-                className="mt-3 text-[12px] font-medium text-[var(--c-muted)] underline-offset-2 hover:text-[var(--c-accent-ink)] hover:underline"
-              >
-                Delete
-              </button>
-            </li>
+            <BrewRow key={e.id} entry={e} onChange={setEntries} />
           ))}
         </ul>
       )}
     </>
+  );
+}
+
+// A logged brew: reads as a summary, flips to an inline editor so you can fix
+// the rating (half-steps), notes, deviation, or beans without re-brewing. The
+// taste-learning insights recompute from the edited data on save.
+function BrewRow({
+  entry: e,
+  onChange,
+}: {
+  entry: JournalEntry;
+  onChange: (all: JournalEntry[]) => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [rating, setRating] = useState(e.rating ?? 0);
+  const [notes, setNotes] = useState(e.notes ?? "");
+  const [deviation, setDeviation] = useState(e.deviation ?? "");
+  const [beans, setBeans] = useState(e.beans ?? "");
+  const [roaster, setRoaster] = useState(e.roaster ?? "");
+
+  const startEdit = () => {
+    setRating(e.rating ?? 0);
+    setNotes(e.notes ?? "");
+    setDeviation(e.deviation ?? "");
+    setBeans(e.beans ?? "");
+    setRoaster(e.roaster ?? "");
+    setEditing(true);
+  };
+
+  const save = () => {
+    onChange(
+      updateEntry(e.id, { rating: rating || undefined, notes, deviation, beans, roaster })
+    );
+    setEditing(false);
+  };
+
+  if (editing) {
+    return (
+      <li className="rounded-2xl border border-[var(--c-accent)]/40 bg-[var(--c-card)] p-5">
+        <div className="text-[12px] uppercase tracking-wide text-[var(--c-muted)]">
+          Editing · {e.method} · 1:{e.ratio} · {e.oz} oz
+        </div>
+        <div className="mt-3 grid gap-3 sm:grid-cols-2">
+          <label className="block">
+            <span className="c-label">Beans</span>
+            <input
+              value={beans}
+              onChange={(ev) => setBeans(ev.target.value)}
+              placeholder="e.g. Methodical Blue Boy"
+              className="mt-1 w-full rounded-xl border border-[var(--c-border)] bg-[var(--c-bg)] px-3.5 py-2.5 text-[14px] text-[var(--c-ink)] outline-none focus:border-[var(--c-accent)]"
+            />
+          </label>
+          <label className="block">
+            <span className="c-label">Roaster / shop</span>
+            <input
+              value={roaster}
+              onChange={(ev) => setRoaster(ev.target.value)}
+              className="mt-1 w-full rounded-xl border border-[var(--c-border)] bg-[var(--c-bg)] px-3.5 py-2.5 text-[14px] text-[var(--c-ink)] outline-none focus:border-[var(--c-accent)]"
+            />
+          </label>
+        </div>
+        <div className="mt-3">
+          <span className="c-label">Rating</span>
+          <RatingStars value={rating} onChange={setRating} />
+        </div>
+        <label className="mt-3 block">
+          <span className="c-label">Notes</span>
+          <textarea
+            value={notes}
+            onChange={(ev) => setNotes(ev.target.value)}
+            rows={2}
+            placeholder="How did it taste?"
+            className="mt-1 w-full rounded-xl border border-[var(--c-border)] bg-[var(--c-bg)] px-3.5 py-2.5 text-[14px] text-[var(--c-ink)] outline-none focus:border-[var(--c-accent)]"
+          />
+        </label>
+        <label className="mt-3 block">
+          <span className="c-label">Went differently (optional)</span>
+          <input
+            value={deviation}
+            onChange={(ev) => setDeviation(ev.target.value)}
+            placeholder="e.g. added 20 g extra water"
+            className="mt-1 w-full rounded-xl border border-[var(--c-border)] bg-[var(--c-bg)] px-3.5 py-2.5 text-[14px] text-[var(--c-ink)] outline-none focus:border-[var(--c-accent)]"
+          />
+        </label>
+        <div className="mt-4 flex gap-2">
+          <button
+            onClick={save}
+            className="inline-flex min-h-[40px] items-center rounded-full bg-[var(--c-accent)] px-6 text-sm font-semibold text-white transition hover:opacity-90 active:scale-95"
+          >
+            Save changes
+          </button>
+          <button
+            onClick={() => setEditing(false)}
+            className="inline-flex min-h-[40px] items-center rounded-full border border-[var(--c-border)] px-5 text-sm font-medium text-[var(--c-muted)] transition hover:border-[var(--c-accent)]/50"
+          >
+            Cancel
+          </button>
+        </div>
+      </li>
+    );
+  }
+
+  return (
+    <li className="rounded-2xl border border-[var(--c-border)] bg-[var(--c-card)] p-5">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <div className="text-[15px] font-bold text-[var(--c-ink)]">
+          {e.beans || e.method}
+          {e.roaster && (
+            <span className="font-normal text-[var(--c-muted)]"> · {e.roaster}</span>
+          )}
+        </div>
+        <span className="text-[12px] text-[var(--c-muted)]">
+          {new Date(e.ts).toLocaleDateString(undefined, {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          })}
+        </span>
+      </div>
+
+      <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-[var(--c-muted)]">
+        <span>{e.method}</span>
+        {e.brewer && <span>· {e.brewer}</span>}
+        <span className="font-mono">· 1:{e.ratio}</span>
+        <span className="font-mono">· {e.oz} oz</span>
+        {typeof e.rating === "number" && e.rating > 0 && <RatingDots value={e.rating} />}
+      </div>
+
+      {e.deviation && (
+        <p className="mt-2 rounded-lg border border-dashed border-[var(--c-accent)]/40 bg-[var(--c-accent)]/[0.05] px-3 py-1.5 text-[12px] leading-relaxed text-[var(--c-muted)]">
+          <span className="font-semibold text-[var(--c-accent-ink)]">
+            Went differently:{" "}
+          </span>
+          {e.deviation}
+        </p>
+      )}
+
+      {e.notes && (
+        <p className="mt-2 text-[13px] leading-relaxed text-[var(--c-muted)]">
+          {e.notes}
+        </p>
+      )}
+
+      <div className="mt-3 flex gap-4">
+        <button
+          onClick={startEdit}
+          className="text-[12px] font-semibold text-[var(--c-accent-ink)] underline-offset-2 hover:underline"
+        >
+          Edit
+        </button>
+        <button
+          onClick={() => onChange(deleteEntry(e.id))}
+          className="text-[12px] font-medium text-[var(--c-muted)] underline-offset-2 hover:text-[var(--c-accent-ink)] hover:underline"
+        >
+          Delete
+        </button>
+      </div>
+    </li>
   );
 }
 

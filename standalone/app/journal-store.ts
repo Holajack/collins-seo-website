@@ -57,6 +57,32 @@ export function deleteEntry(id: string): JournalEntry[] {
   return all;
 }
 
+/** Editable fields of a logged brew — the recipe facts (method/ratio/oz) stay
+ *  fixed, but your read on how it tasted can always be corrected. */
+export type EntryEdit = Pick<
+  JournalEntry,
+  "rating" | "notes" | "beans" | "roaster" | "deviation"
+>;
+
+export function updateEntry(id: string, patch: EntryEdit): JournalEntry[] {
+  const all = loadJournal().map((e) =>
+    e.id === id
+      ? {
+          ...e,
+          rating: patch.rating,
+          notes: patch.notes?.trim() || undefined,
+          beans: patch.beans?.trim() || undefined,
+          roaster: patch.roaster?.trim() || undefined,
+          deviation: patch.deviation?.trim() || undefined,
+        }
+      : e
+  );
+  try {
+    window.localStorage.setItem(KEY, JSON.stringify(all));
+  } catch {}
+  return all;
+}
+
 // ─── Durability: backup & restore ───────────────────────────────────────────
 // The journal's one copy lives in localStorage, so a phone change or a cleared
 // browser is total loss. Backups are a plain JSON file the user owns — no
