@@ -8,11 +8,19 @@
 // treat notes as a snapshot, and follow the website link for today's list.
 // ─────────────────────────────────────────────────────────────────────────
 
+export type BeanKind =
+  | "single-origin"
+  | "blend"
+  | "espresso"
+  | "decaf"
+  | "other";
+
 export interface ShopBean {
   name: string;
   roastLevel?: string;
   notes: string;
   origin?: string;
+  kind?: BeanKind;
 }
 
 export interface CoffeeShop {
@@ -24,6 +32,10 @@ export interface CoffeeShop {
   roastsOwn: boolean;
   beans: ShopBean[];
   offers: string;
+  /** Short descriptor for the card, from the roaster's own site. */
+  tagline?: string;
+  /** Verified brand hex color, used to tint the shop's monogram tile. */
+  brandColor?: string;
 }
 
 export const REGION_LABELS: Record<CoffeeShop["region"], string> = {
