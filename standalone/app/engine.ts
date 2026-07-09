@@ -57,6 +57,10 @@ export interface PourStep {
   waterToG: number; // cumulative water on the scale after this pour (grams)
   addG: number; // water added during this step (grams)
   detail: string;
+  /** "action" (default): the human must DO something now — chime + tap.
+   *  "phase": passive stretch (steep/drawdown/done) — shown softly, silent;
+   *  the human paces against pours, not against waiting. */
+  kind?: "action" | "phase";
 }
 
 export interface BrewResult {

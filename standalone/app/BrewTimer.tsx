@@ -150,15 +150,22 @@ export default function BrewTimer({
     const prev = lastStepRef.current;
     if (activeIdx <= prev) return;
     lastStepRef.current = activeIdx;
+    // Only ACTION steps demand the human's hands — passive phases (steep,
+    // drawdown, done) change the display silently. Fewer chimes, all real.
+    const crossedActions = steps
+      .slice(prev + 1, activeIdx + 1)
+      .filter((st) => st.kind !== "phase");
+    if (crossedActions.length === 0) return;
     if ("vibrate" in navigator) navigator.vibrate?.(60);
     if (!muted && audioRef.current) {
       const ctx = audioRef.current;
-      for (let i = prev + 1; i <= activeIdx; i++) {
-        const delayMs = (i - prev - 1) * 400;
+      crossedActions.forEach((_, i) => {
+        const delayMs = i * 400;
         if (delayMs === 0) playChime(ctx, "pour");
         else window.setTimeout(() => playChime(ctx, "pour"), delayMs);
-      }
+      });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeIdx, running, muted]);
 
   const finished = elapsed >= totalSec;
@@ -215,9 +222,13 @@ export default function BrewTimer({
     });
   };
 
-  // "Pour now" pulse for ~2.5s after a step begins.
+  // "Pour now" pulse for ~2.5s after an ACTION step begins — passive phases
+  // never pulse; there's nothing to rush to.
   const inPourWindow =
-    activeStep != null && elapsed - activeStep.atSec < 2.5 && running;
+    activeStep != null &&
+    activeStep.kind !== "phase" &&
+    elapsed - activeStep.atSec < 2.5 &&
+    running;
 
   const remaining = Math.max(0, totalSec - elapsed);
 
@@ -298,7 +309,11 @@ export default function BrewTimer({
           ) : activeStep ? (
             <div>
               <div className="text-[11px] font-semibold uppercase tracking-wide text-[var(--c-muted)]">
-                {inPourWindow ? "Now" : "Current step"}
+                {inPourWindow
+                  ? "Now"
+                  : activeStep.kind === "phase"
+                  ? "Hands off"
+                  : "Current step"}
               </div>
               <div
                 className={`text-xl font-bold text-[var(--c-ink)] ${
@@ -369,37 +384,56 @@ export default function BrewTimer({
         {steps.map((step, i) => {
           const done = i < activeIdx;
           const active = i === activeIdx;
+          const isPhase = step.kind === "phase";
+          // Number only the ACTION steps — those are the things you do.
+          const actionNo =
+            steps.slice(0, i + 1).filter((st) => st.kind !== "phase").length;
           return (
             <li
               key={i}
               className={`flex gap-3 rounded-xl px-3 py-2 transition lg:mb-2.5 lg:break-inside-avoid ${
                 active
-                  ? "bg-[var(--c-accent)]/10 ring-1 ring-[var(--c-accent)]/30"
+                  ? isPhase
+                    ? "bg-[var(--c-border)]/30 ring-1 ring-[var(--c-border)]"
+                    : "bg-[var(--c-accent)]/10 ring-1 ring-[var(--c-accent)]/30"
                   : ""
               }`}
             >
               <span
                 className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${
-                  done
+                  isPhase
+                    ? "border border-dashed border-[var(--c-muted)]/50 text-[var(--c-muted)]"
+                    : done
                     ? "bg-[var(--c-accent)] text-white"
                     : active
                     ? "bg-[var(--c-accent-ink)] text-white"
                     : "bg-[var(--c-border)] text-[var(--c-muted)]"
                 }`}
               >
-                {done ? "✓" : i + 1}
+                {isPhase ? "·" : done ? "✓" : actionNo}
               </span>
               <span className="flex-1">
                 <span className="flex items-baseline justify-between gap-2">
-                  <span className="text-sm font-semibold text-[var(--c-ink)]">
+                  <span
+                    className={`text-sm font-semibold ${
+                      isPhase ? "text-[var(--c-muted)]" : "text-[var(--c-ink)]"
+                    }`}
+                  >
                     <span className="font-mono text-[var(--c-accent-ink)]">
                       {formatTime(step.atSec)}
                     </span>{" "}
                     {step.label}
+                    {isPhase && (
+                      <span className="ml-1.5 text-[10px] font-medium uppercase tracking-wide opacity-70">
+                        hands off
+                      </span>
+                    )}
                   </span>
-                  <span className="font-mono text-[13px] text-[var(--c-muted)]">
-                    → {step.waterToG} g
-                  </span>
+                  {step.addG > 0 && (
+                    <span className="font-mono text-[13px] text-[var(--c-muted)]">
+                      → {step.waterToG} g
+                    </span>
+                  )}
                 </span>
                 <span className="block text-[12px] leading-relaxed text-[var(--c-muted)]">
                   {step.detail}
