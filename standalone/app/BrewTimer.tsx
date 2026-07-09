@@ -371,10 +371,9 @@ export default function BrewTimer({
           </div>
 
           <p className="mt-3 text-[11px] leading-relaxed text-[var(--c-muted)]">
-            Chimes at every step — pours, stirs, the cap, the press — and keeps
-            your screen awake while you brew. Also taps, on phones that support
-            it.
-          </p>
+            Chimes only when your hands are needed — pours, presses, cuts. The
+            waiting parts stay silent. Keeps your screen awake; taps on phones
+            that support it.</p>
         </div>
       </div>
 

@@ -37,8 +37,8 @@ const METHODS: Record<BrewMethodKey, BrewMethod & { shortName: string }> = {
         "Pour about 2–3× the coffee's weight in water to fully saturate the bed, swirl the dripper gently for even wetting, then rest until 0:45 to degas (longer for fresher, lighter roasts). Fresh coffee will dome and bubble.",
     },
     pourSchedule:
-      "Hoffmann two-pour: bloom + swirl, to 60% of the water by 1:15, to 100% by 1:45, stir, final swirl, drawdown done ~3:00–3:30. Small cups switch to four equal pulses.",
-    totalBrewTimeSec: { low: 180, high: 225 },
+      "Three actions, ever: bloom + swirl at 0:00, pour to 60% at 0:45, pour to 100% at ~1:15 — then Hoffmann's untimed stir + swirl as you set the kettle down, and hands off. A standard cup finishes drawing down around 4:00 (3:15–4:15 is all normal).",
+    totalBrewTimeSec: { low: 210, high: 285 },
     isImmersion: false,
     notes: [
       "Aim for ~205–208°F for light roasts, ~200–205°F medium, ~195–200°F dark. Avoid a full rolling boil.",
@@ -70,8 +70,8 @@ const METHODS: Record<BrewMethodKey, BrewMethod & { shortName: string }> = {
         "Pour bloom water (about 2–3× the coffee weight) in a slow spiral from the center out until every ground is wet. Gently swirl the Chemex to soak any dry pockets, then rest until 0:45 to let CO₂ escape. The thick filter is slow, so an even bloom matters even more here.",
     },
     pourSchedule:
-      "Bloom, then staged spiral pours every ~45s (two on a 3-cup, three on the classic, four on big batches), stir & swirl, and a drawdown about as long as the pouring phase.",
-    totalBrewTimeSec: { low: 210, high: 330 },
+      "Rinse the bonded filter first (triple-fold toward the spout). Then the same three actions as a V60 — bloom, pour to 60%, pour to full — with the stir folded into the last pour; batches over ~560 g split into three gentler pours. The thick filter makes drawdown long: ~4:45 for a standard brew is on time.",
+    totalBrewTimeSec: { low: 225, high: 405 },
     isImmersion: false,
     notes: [
       "Brew runs slow? Go coarser — a stalled Chemex over-extracts and turns bitter.",
@@ -101,8 +101,8 @@ const METHODS: Record<BrewMethodKey, BrewMethod & { shortName: string }> = {
       technique: "",
     },
     pourSchedule:
-      "All water goes in the lower bulb first. Heat until it rises to the top chamber — the timer starts there. Add the grounds and stir 3–5 circles to saturate, hold a low flame, break the crust mid-steep, then final stir + heat off at ~1:00–1:35 by batch size — the vacuum draws the brew down in ~30–60s.",
-    totalBrewTimeSec: { low: 105, high: 165 },
+      "Setup, before the timer: water in the lower bulb, heat until it rises and settles up top, then turn the flame to LOW. From there only two timed actions: add the grounds with a brisk stir at 0:00, and cut the heat with a final gentle stir at ~1:00–1:20. The vacuum does the rest.",
+    totalBrewTimeSec: { low: 135, high: 225 },
     isImmersion: true,
     notes: [
       "There's no CO₂ bloom here — the gentle stir on immersion is what evenly saturates the bed.",
@@ -126,16 +126,17 @@ const METHODS: Record<BrewMethodKey, BrewMethod & { shortName: string }> = {
     absorptionPerGram: 1.5,
     grind: "Medium-fine — like table salt (slightly finer than drip)",
     waterTempF: { low: 185, high: 205 },
+    // No bloom: full immersion — the 2–3 stir turns folded into the pour do
+    // the saturating (AeroPress official; Hoffmann pours everything at once).
     bloom: {
-      applies: true,
-      waterMultiplier: 2,
-      timeSec: 30,
-      technique:
-        "This isn't a true pour-over bloom — AeroPress is full immersion, so there's no draining bed to degas. But for fresh coffee it still helps: add ~2× the coffee weight, stir to wet everything, and rest 30s to release CO₂ before topping up. Skip the rest for darker roasts.",
+      applies: false,
+      waterMultiplier: 0,
+      timeSec: 0,
+      technique: "",
     },
     pourSchedule:
-      "Add coffee, bloom 30s, fill by 0:55, brief stir, cap with a slight pull-up, steep hands-off to 2:00, then press gently for 25–30s. Stop at the hiss. Done by 2:30.",
-    totalBrewTimeSec: { low: 90, high: 150 },
+      "Two actions: pour everything + stir + seal as one motion at 0:00, then swirl-settle-press at 2:30. That's the whole method — the long silent steep in between is where the cup is made. Oversize cups add one more: a bypass top-up after the press.",
+    totalBrewTimeSec: { low: 215, high: 300 },
     isImmersion: true,
     notes: [
       "Default ~200–205°F for medium/dark roasts; drop toward 185–195°F for light roasts.",
