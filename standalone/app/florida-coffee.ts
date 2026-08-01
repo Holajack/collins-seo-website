@@ -456,7 +456,7 @@ export const FLORIDA_SHOPS: CoffeeShop[] = [
     "city": "Miami (Little River flagship, plus Aventura Mall)",
     "region": "miami",
     "website": "https://www.imperialmoto.com",
-    "summary": "Moto-inspired cafe, in-house roastery, and lifestyle brand founded 2016 in Little River, roasting daily with coffee sourced from farms in Brazil and Colombia.",
+    "summary": "Moto-inspired cafe, in-house roastery, and lifestyle brand founded 2016 in Little River, roasting daily with coffee sourced from farms in Brazil and Colombia; now four locations — the Little River flagship, Aventura Mall, Oakland Park (first Broward location, opened January 2025), and St. Barths.",
     "tagline": "Moto-Inspired Coffee & Lifestyle Brand",
     "roastsOwn": true,
     "beans": [
@@ -830,7 +830,7 @@ export const FLORIDA_SHOPS: CoffeeShop[] = [
     "city": "Lakeland, FL",
     "region": "orlando",
     "website": "https://concordcoffee.com/",
-    "summary": "Lakeland's small-batch roastery-cafe on South Florida Avenue, roasting every bean in town and expanding with a second location at Orlando Health Lakeland Highlands.",
+    "summary": "Lakeland's small-batch roastery-cafe on South Florida Avenue, roasting every bean in town, with a second location now open inside the Orlando Health Watson Clinic Lakeland Highlands Hospital (opened July 2026).",
     "tagline": "Good things happen over coffee",
     "roastsOwn": true,
     "beans": [
@@ -1182,7 +1182,7 @@ export const FLORIDA_SHOPS: CoffeeShop[] = [
     "city": "St. Petersburg",
     "region": "tampa",
     "website": "https://paradecocoffee.com",
-    "summary": "Art deco-inspired downtown St. Pete cafe roasting in-house with a sustainability bent — zero-emission roaster and partnerships with women-owned farms.",
+    "summary": "Art deco-inspired downtown St. Pete cafe roasting in-house with a sustainability bent — zero-emission roaster and partnerships with women-owned farms; now two locations, with a second waterfront cafe at SkyBeach Resort in the Skyway Marina District (opened spring 2025).",
     "tagline": "Bringing you daily doses of Paradise",
     "roastsOwn": true,
     "beans": [
@@ -1236,7 +1236,7 @@ export const FLORIDA_SHOPS: CoffeeShop[] = [
         "kind": "decaf"
       }
     ],
-    "offers": "Monthly coffee subscriptions available via paradecocoffee.com/shop/monthly-coffee-subscriptions/ (no discount promotions seen)"
+    "offers": "Monthly coffee subscriptions (from $20.00/month) and bi-weekly coffee subscriptions (from $20.00 every 2 weeks) — 12 oz bags of whole bean coffee, choose your offering or receive a monthly rotation — via paradecocoffee.com/shop; mobile ordering at order.paradecocoffee.com."
   },
   {
     "name": "Palma Coffee Co.",
@@ -1310,7 +1310,7 @@ export const FLORIDA_SHOPS: CoffeeShop[] = [
     "city": "Jacksonville",
     "region": "jax",
     "website": "https://boldbeancoffee.com",
-    "summary": "Jacksonville's flagship specialty roaster with cafes in Riverside, San Marco, and Jax Beach, roasting single origins and house blends since 2012.",
+    "summary": "Jacksonville's flagship specialty roaster, roasting single origins and house blends since 2012; its San Marco cafe closed permanently, but the Riverside and Jax Beach cafes remain open.",
     "tagline": "Specialty coffees for the bold at heart",
     "roastsOwn": true,
     "beans": [
@@ -1808,7 +1808,7 @@ export const FLORIDA_SHOPS: CoffeeShop[] = [
     "city": "Greenville, SC",
     "region": "sc",
     "website": "https://methodicalcoffee.com",
-    "summary": "Greenville's flagship specialty roaster and multi-cafe operation (Downtown, Commons, Stones Point, plus a bakery), roasting to order and shipping nationwide.",
+    "summary": "Greenville's flagship specialty roaster and multi-cafe operation (Downtown, Commons and Stones Point in Greenville, plus a BullStreet cafe in Columbia and the Bake Room bakery), roasting to order and shipping nationwide.",
     "tagline": "Coffee nerds, not coffee snobs",
     "roastsOwn": true,
     "beans": [
@@ -2059,7 +2059,7 @@ export const FLORIDA_SHOPS: CoffeeShop[] = [
     "city": "Spartanburg, SC",
     "region": "sc",
     "website": "https://www.littleriverroasting.com",
-    "summary": "Spartanburg's original small-batch specialty roaster (since 2001), with four cafe locations and 'Farmer Friendly' direct-relationship sourcing that pays above market price.",
+    "summary": "Spartanburg's original small-batch specialty roaster (since 2001), with three cafe locations and 'Farmer Friendly' direct-relationship sourcing that pays above market price.",
     "tagline": "Small-batch, ethically sourced since 2001",
     "roastsOwn": true,
     "beans": [
@@ -2125,7 +2125,7 @@ export const FLORIDA_SHOPS: CoffeeShop[] = [
         "kind": "blend"
       }
     ],
-    "offers": "Online shop at shop.littleriverroasting.com selling fresh-roasted coffee, breakfast/lunch, and merch; wholesale program; four Spartanburg cafe locations."
+    "offers": "Online shop at shop.littleriverroasting.com selling fresh-roasted coffee, breakfast/lunch, and merch; wholesale program; three Spartanburg cafe locations."
   },
   {
     "name": "Mōzza Roasters",
@@ -2301,7 +2301,7 @@ export const FLORIDA_SHOPS: CoffeeShop[] = [
     "city": "Charleston, SC",
     "region": "sc",
     "website": "https://foresightcoffee.com/",
-    "summary": "Charleston's upper King Street small-batch roaster (roasting in the Lowcountry since 2015 as Springbok, now Foresight), partnering directly with producers for traceable lots.",
+    "summary": "Charleston-area small-batch roaster (roasting in the Lowcountry since 2015 as Springbok, rebranded Foresight in 2024), now operating its roastery and cafe at 1135 Gregorie Ferry Rd in Mount Pleasant, partnering directly with producers for traceable lots.",
     "roastsOwn": true,
     "beans": [
       {
@@ -2582,7 +2582,7 @@ export const FLORIDA_SHOPS: CoffeeShop[] = [
     "city": "Columbia, SC",
     "region": "sc",
     "website": "https://www.curiositycoffeebar.com/",
-    "summary": "Neighborhood coffee shop and bar on North Main Street serving ethically sourced single-origin coffee plus beer, wine, and locally sourced food.",
+    "summary": "Neighborhood coffee shop and bar on North Main Street serving ethically sourced single-origin coffee plus beer, wine, and locally sourced food, with a second café, Curiosity at the Library, inside Richland Library Main on Assembly Street (opened May 2025).",
     "tagline": "Proudly independent, ethically sourced coffee",
     "roastsOwn": false,
     "beans": [
